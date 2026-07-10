@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -52,7 +54,7 @@ export default function Home() {
 
           <nav className="hidden md:flex gap-10 items-center font-medium text-sm text-gray-300">
             <Link href="#" className="hover:text-white transition-colors duration-200">Home</Link>
-            <Link href="#examples" className="hover:text-white transition-colors duration-200">Templates & Examples</Link>
+            <button onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors duration-200 text-left">Templates</button>
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
@@ -100,9 +102,9 @@ export default function Home() {
                   Build Your CV
                 </Button>
               </Link>
-              <Link href="#examples" className="text-gray-400 hover:text-white underline underline-offset-4 text-base font-medium transition-colors duration-200">
+              <button onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} className="text-gray-400 hover:text-white underline underline-offset-4 text-base font-medium transition-colors duration-200">
                 See Examples
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -159,16 +161,16 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {mockExamples.map((ex) => (
               <div key={ex.id} className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 cursor-pointer shadow-xl">
-                
+
                 {/* Mini CV Preview */}
                 <div className={`w-full aspect-[1/1.4] ${ex.color} rounded-xl p-4 shadow-inner flex flex-col gap-3 mb-6 relative overflow-hidden group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow`}>
-                  
+
                   {/* Fake Resume Content */}
                   <div className={`w-full border-b border-gray-300 pb-2 flex flex-col ${ex.headerAlign}`}>
                     <div className="w-1/2 h-2.5 bg-gray-800 rounded-full mb-1.5"></div>
                     <div className="w-1/3 h-1.5 bg-gray-500 rounded-full"></div>
                   </div>
-                  
+
                   <div className="flex gap-3 h-full">
                     <div className="w-full flex flex-col gap-3">
                       <div>
@@ -190,10 +192,10 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Hover overlay button */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                     <div className="bg-white text-black px-4 py-2 rounded-full font-bold text-sm">Preview Layout</div>
+                    <div className="bg-white text-black px-4 py-2 rounded-full font-bold text-sm">Preview Layout</div>
                   </div>
                 </div>
 
