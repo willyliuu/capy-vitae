@@ -9,9 +9,12 @@ export function BambooModern({ data }: Props) {
   const { personalInfo, summary, experience, education, skills } = data;
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white text-gray-800 font-sans shadow-lg flex min-h-[1056px]">
+    <div className="w-full max-w-4xl mx-auto bg-white text-gray-800 font-sans shadow-lg flex min-h-[1056px] relative z-0">
+      {/* Print Background Hack: Repeats on every PDF page */}
+      <div className="hidden print:block fixed inset-y-0 left-0 w-1/3 bg-gray-100 -z-10" />
+
       {/* Sidebar */}
-      <aside className="w-1/3 bg-gray-100 p-8 flex flex-col space-y-8">
+      <aside className="w-1/3 bg-gray-100 print:bg-transparent p-8 flex flex-col space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 leading-tight">
             {personalInfo.firstName} <br /> {personalInfo.lastName}

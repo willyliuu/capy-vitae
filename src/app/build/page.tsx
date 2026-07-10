@@ -28,7 +28,7 @@ export default function OnboardingPage() {
       {/* Capy Mascot Tips */}
       <div className="flex items-start space-x-6 w-full mb-12 bg-secondary/30 p-6 rounded-2xl border border-border/50">
         <div className="w-24 h-24 relative shrink-0">
-          <Image src={step === "background" ? "/assets/mascot/thinking.png" : "/assets/mascot/default.png"} alt="Capy" fill className="object-contain" />
+          <Image src={step === "background" ? "/assets/mascot/thinking.png" : "/assets/mascot/capybara_logo.png"} alt="Capy" fill sizes="96px" className="object-contain" />
         </div>
         <div className="flex-1 mt-2">
           <h2 className="text-xl font-heading font-bold text-foreground mb-1">

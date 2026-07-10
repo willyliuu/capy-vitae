@@ -121,9 +121,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -139,12 +141,8 @@
     }
 
     @page {
-      margin: 15mm 0;
+      margin: 0;
       size: auto;
-    }
-
-    @page :first {
-      margin-top: 0;
     }
 
     .print\:hidden {
