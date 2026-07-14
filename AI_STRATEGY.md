@@ -63,9 +63,12 @@ Here is my honest take and strategic roadmap for AI integration, ordered by impa
 * The user can click "Prep for Interview". 
 * The AI asks them tough questions based *specifically* on their resume: *"I see you migrated a database to AWS in 2022. Can you tell me about a specific roadblock you hit during that migration?"*
 
-### 6. Dynamic AI Theming
-* When parsing the PDF, infer the user's industry (e.g., Corporate Finance vs. Creative UI Designer).
-* Have the AI automatically select the CapyVitae template, font pairing, and color scheme (`bg-slate-100` vs `bg-stone-100`) that statistically performs best for their specific industry.
+### 6. AI-Driven Layouts & The "Matchmaker"
+**The Problem:** Simply adding more static templates scales poorly and forces users into a paradox of choice. Most users don't know which layout best suits their specific industry or target role.
+**The AI Solution (3-Phase Roadmap):**
+*   **Phase 1: The AI Matchmaker:** Instead of a template picker, we implement an "Auto-Layout" feature. The AI analyzes the user's Target Role and automatically routes them to the best-performing template (e.g., `CapybaraClassic` for Law/Finance, `RiverFlow` for Design).
+*   **Phase 2: Dynamic Theme Tokens:** Move away from hardcoded CSS classes. Give the AI control over "Theme Tokens" (typography, colors, spacing). The AI can adapt accent colors to perfectly match a target company's branding based on a pasted job description.
+*   **Phase 3: Fully Generative UI (Moonshot):** A modular layout system where the LLM dictates the literal structure of the CV via JSON (e.g., determining whether a 2-column or 1-column layout is optimal based on the sheer volume of experience).
 
 ---
 
