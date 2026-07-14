@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 const mockExamples = [
@@ -43,7 +44,12 @@ export default function Home() {
   return (
     <div className="min-h-screen text-foreground relative flex flex-col overflow-x-hidden">
       {/* Navigation Bar */}
-      <header className="w-full relative z-50 mt-6 shrink-0 px-8">
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full relative z-50 mt-6 shrink-0 px-8"
+      >
         <div className="container mx-auto h-20 flex items-center justify-between bg-white/5 backdrop-blur-md px-8 py-3 rounded-[40px] border border-white/10 shadow-lg">
           <div className="flex items-center gap-4">
             <div className="relative w-16 h-16 drop-shadow-md translate-y-1">
@@ -65,103 +71,164 @@ export default function Home() {
             </Link>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content Hero */}
-      <main className="container mx-auto px-8 flex flex-col justify-center py-20 relative z-10 w-full max-w-7xl min-h-[calc(100vh-100px)]">
+      <main className="container mx-auto px-8 flex flex-col justify-center py-4 relative z-10 w-full max-w-7xl min-h-[calc(100vh-104px)]">
 
-        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-12 mb-16">
-          {/* Left Column: Mascot Graphic */}
-          <div className="flex-1 relative w-full h-full min-h-[45vh] lg:min-h-[55vh] flex items-center justify-center order-1 lg:order-none">
-            <div className="absolute inset-0 max-w-2xl mx-auto drop-shadow-[0_0_40px_rgba(46,74,53,0.4)] transition-transform duration-700 hover:scale-[1.02]">
+        <div className="w-full flex-1 flex flex-col lg:flex-row items-center justify-between gap-6 mb-6 min-h-0">
+          {/* Right Column: Mascot Graphic */}
+          <motion.div
+            initial={{ opacity: 0, scale: 1.3, rotate: -5 }}
+            animate={{ opacity: 1, scale: 1.5, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="flex-1 relative w-full h-full flex items-center justify-center order-2 lg:order-2 min-h-[300px] lg:min-h-[450px]"
+          >
+            <div className="absolute inset-0 max-w-xl mx-auto drop-shadow-[0_0_40px_rgba(46,74,53,0.4)] transition-transform duration-700 hover:scale-[1.02]">
               <Image
                 src="/assets/mascot/capybara_hero.png"
                 alt="Capy the Mascot"
                 fill
-                sizes="(max-width: 768px) 100vw, 900px"
+                sizes="(max-width: 768px) 100vw, 800px"
                 className="object-contain"
                 priority
               />
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right Column: Text & CTA */}
-          <div className="flex-1 flex flex-col items-start text-left shrink-0 max-w-xl">
-            <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-gray-400 font-sans">
+          {/* Left Column: Text & CTA */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            className="flex-1 flex flex-col items-start text-left shrink-0 max-w-xl order-1 lg:order-1"
+          >
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+              className="text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4 text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-gray-400 font-sans"
+            >
               Create a Captivating CV<br />
               with CapyVitae.
-            </h1>
+            </motion.h1>
 
-            <p className="text-lg text-gray-400 font-medium leading-relaxed mb-8">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+              className="text-base text-gray-300 font-medium leading-relaxed mb-6"
+            >
               The relaxing way to build your perfect resume. Craft your professional story with ease using simple, modern templates inspired by the calm of nature.
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7, ease: "easeOut" }}
+              className="flex flex-col sm:flex-row items-center gap-4"
+            >
               <Link href="/build">
-                <Button size="lg" className="h-14 px-10 text-lg font-semibold rounded-full bg-[#A17757] hover:bg-[#8B5E3C] text-white border-none shadow-[0_4px_14px_0_rgba(161,119,87,0.39)] hover:shadow-[0_6px_20px_rgba(161,119,87,0.23)] transition-all duration-300">
+                <Button size="lg" className="h-12 px-8 text-base font-semibold rounded-full bg-[#A17757] hover:bg-[#8B5E3C] text-white border-none shadow-[0_4px_14px_0_rgba(161,119,87,0.39)] hover:shadow-[0_6px_20px_rgba(161,119,87,0.23)] transition-all duration-300">
                   Build Your CV
                 </Button>
               </Link>
-              <button onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} className="text-gray-400 hover:text-white underline underline-offset-4 text-base font-medium transition-colors duration-200">
+              <button onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} className="h-12 px-8 text-sm font-semibold rounded-full border border-white/20 hover:bg-white/10 text-white transition-all duration-300">
                 See Examples
               </button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Feature Cards */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8 shrink-0 mt-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.2, delayChildren: 0.2 }
+            }
+          }}
+          className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0"
+        >
           {/* Card 1 */}
-          <div className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px] flex flex-col items-start shadow-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
-            <div className="w-14 h-14 rounded-[20px] bg-white/5 flex items-center justify-center mb-6 border border-white/10 text-[#A17757] group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } }} className="group bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[24px] flex flex-col items-start shadow-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
+            <div className="w-12 h-12 rounded-[16px] bg-white/5 flex items-center justify-center mb-4 border border-white/10 text-[#A17757] group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">Modern Templates</h3>
-            <p className="text-gray-400 leading-relaxed text-[15px]">
+            <span className="text-[#A17757] font-bold text-xs tracking-wider uppercase mb-1">Step 1</span>
+            <h3 className="text-lg font-bold text-white mb-2">Modern Templates</h3>
+            <p className="text-gray-300 leading-relaxed text-[14px]">
               Choose from a variety of sleek, professional layouts designed to make your experience stand out.
             </p>
-          </div>
+          </motion.div>
 
           {/* Card 2 */}
-          <div className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px] flex flex-col items-start shadow-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
-            <div className="w-14 h-14 rounded-[20px] bg-white/5 flex items-center justify-center mb-6 border border-white/10 text-[#A17757] group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } }} className="group bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[24px] flex flex-col items-start shadow-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
+            <div className="w-12 h-12 rounded-[16px] bg-white/5 flex items-center justify-center mb-4 border border-white/10 text-[#A17757] group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">Intuitive Builder</h3>
-            <p className="text-gray-400 leading-relaxed text-[15px]">
+            <span className="text-[#A17757] font-bold text-xs tracking-wider uppercase mb-1">Step 2</span>
+            <h3 className="text-lg font-bold text-white mb-2">Intuitive Builder</h3>
+            <p className="text-gray-300 leading-relaxed text-[14px]">
               Our smart editor takes the hassle out of formatting so you can focus purely on your content.
             </p>
-          </div>
+          </motion.div>
 
           {/* Card 3 */}
-          <div className="group bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px] flex flex-col items-start shadow-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
-            <div className="w-14 h-14 rounded-[20px] bg-white/5 flex items-center justify-center mb-6 border border-white/10 text-[#A17757] group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } }} className="group bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[24px] flex flex-col items-start shadow-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
+            <div className="w-12 h-12 rounded-[16px] bg-white/5 flex items-center justify-center mb-4 border border-white/10 text-[#A17757] group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">Professional Results</h3>
-            <p className="text-gray-400 leading-relaxed text-[15px]">
+            <span className="text-[#A17757] font-bold text-xs tracking-wider uppercase mb-1">Step 3</span>
+            <h3 className="text-lg font-bold text-white mb-2">Professional Results</h3>
+            <p className="text-gray-300 leading-relaxed text-[14px]">
               Export pixel-perfect PDF resumes that pass ATS scanners and impress recruiters instantly.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
 
       {/* Examples Section */}
       <section id="examples" className="w-full relative z-10 pt-24 pb-32 mt-12 bg-black/20 border-t border-white/5">
         <div className="container mx-auto px-8 max-w-7xl">
-          <div className="flex flex-col items-center text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col items-center text-center mb-16"
+          >
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-gray-400">
               See What You Can Build
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl">
               Browse examples of real resumes built with CapyVitae. Whether you're in tech, design, or business, we have a layout that fits your story.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.15 }
+              }
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
             {mockExamples.map((ex) => (
-              <div key={ex.id} className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 cursor-pointer shadow-xl">
-
+              <motion.div
+                variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } } }}
+                key={ex.id}
+                className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 cursor-pointer shadow-xl"
+              >
                 {/* Mini CV Preview */}
                 <div className={`w-full aspect-[1/1.4] ${ex.color} rounded-xl p-4 shadow-inner flex flex-col gap-3 mb-6 relative overflow-hidden group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow`}>
 
@@ -203,17 +270,23 @@ export default function Home() {
                 <h3 className="text-xl font-bold text-white mb-1">{ex.title}</h3>
                 <p className="text-[#A17757] font-semibold text-sm mb-3">{ex.templateName}</p>
                 <p className="text-gray-400 text-sm leading-relaxed">{ex.description}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <div className="mt-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+            className="mt-20 text-center"
+          >
             <Link href="/build">
               <Button size="lg" className="h-14 px-10 text-lg font-semibold rounded-full bg-[#A17757] hover:bg-[#8B5E3C] text-white border-none shadow-[0_4px_14px_0_rgba(161,119,87,0.39)] transition-all duration-300">
                 Start Building
               </Button>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
