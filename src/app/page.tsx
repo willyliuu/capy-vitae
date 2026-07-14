@@ -202,11 +202,11 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex flex-col items-center text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-gray-400">
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-linear-to-br from-white via-white to-gray-400">
               See What You Can Build
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl">
-              Browse examples of real resumes built with CapyVitae. Whether you're in tech, design, or business, we have a layout that fits your story.
+              Browse examples of real resumes built with CapyVitae. Whether you&apos;re in tech, design, or business, we have a layout that fits your story.
             </p>
           </motion.div>
 

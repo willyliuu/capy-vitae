@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Trash2, Printer } from "lucide-react";
+import { Plus, Trash2, Printer, Sparkles, Loader2, Undo } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,12 @@ import { BambooModern } from "@/components/templates/BambooModern";
 import { RiverFlow } from "@/components/templates/RiverFlow";
 import { CanopyBold } from "@/components/templates/CanopyBold";
 
+const bulletPointSchema = z.object({
+  id: z.string().optional(),
+  text: z.string(),
+  originalText: z.string().optional(),
+});
+
 const formSchema = z.object({
   personalInfo: z.object({
     firstName: z.string().min(1, "First name is required"),
@@ -32,6 +38,7 @@ const formSchema = z.object({
     role: z.string(),
   }),
   summary: z.string(),
+  summaryOriginalText: z.string().optional(),
   experience: z.array(z.object({
     id: z.string(),
     role: z.string(),
@@ -39,7 +46,7 @@ const formSchema = z.object({
     location: z.string(),
     startDate: z.string(),
     endDate: z.string(),
-    description: z.string(), // We'll split this by newline to make the array later
+    bulletPoints: z.array(bulletPointSchema),
   })),
   education: z.array(z.object({
     id: z.string(),
@@ -48,15 +55,239 @@ const formSchema = z.object({
     location: z.string(),
     startDate: z.string(),
     endDate: z.string(),
-    description: z.string(),
+    bulletPoints: z.array(bulletPointSchema),
   })),
   skills: z.string(), // Comma separated
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
+import { Control, UseFormRegister } from "react-hook-form";
+
+interface BulletListProps {
+  control: Control<FormValues>;
+  register: UseFormRegister<FormValues>;
+  isEnhancing: string | null;
+}
+
+interface ExperienceBulletListProps extends Omit<BulletListProps, 'handleMagicEnhance' | 'handleUndo'> {
+  expIndex: number;
+  handleMagicEnhance: (section: "experience", expIndex: number, bulletIndex: number, style: string) => Promise<void>;
+  handleUndo: (section: "experience", expIndex: number, bulletIndex: number) => void;
+}
+
+interface EducationBulletListProps extends Omit<BulletListProps, 'handleMagicEnhance' | 'handleUndo'> {
+  eduIndex: number;
+  handleMagicEnhance: (section: "education", eduIndex: number, bulletIndex: number, style: string) => Promise<void>;
+  handleUndo: (section: "education", eduIndex: number, bulletIndex: number) => void;
+}
+
+// Components for nested arrays
+function ExperienceBulletList({ control, register, expIndex, isEnhancing, handleMagicEnhance, handleUndo }: ExperienceBulletListProps) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `experience.${expIndex}.bulletPoints`,
+  });
+
+  return (
+    <div className="md:col-span-2 space-y-4">
+      <Label>Description / Responsibilities</Label>
+      <div className="space-y-3">
+        {fields.map((field, bulletIndex) => {
+          const enhanceKey = `experience-${expIndex}-${bulletIndex}`;
+          return (
+            <div key={field.id} className="relative flex flex-col gap-2 p-3 border rounded-md bg-background">
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("experience", expIndex, bulletIndex, "metric")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-yellow-500" />} Metric
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("experience", expIndex, bulletIndex, "leadership")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-purple-500" />} Leadership
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("experience", expIndex, bulletIndex, "simple")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-blue-500" />} Simple
+                  </Button>
+                  {control._formValues.experience[expIndex]?.bulletPoints[bulletIndex]?.originalText && (
+                    <Button type="button" variant="secondary" size="sm" className="h-7 text-xs" onClick={() => handleUndo("experience", expIndex, bulletIndex)}>
+                      <Undo className="w-3 h-3 mr-1" /> Undo
+                    </Button>
+                  )}
+                </div>
+                <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive" onClick={() => remove(bulletIndex)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              <Textarea
+                {...register(`experience.${expIndex}.bulletPoints.${bulletIndex}.text` as const)}
+                placeholder="Describe your achievement..."
+                className="min-h-[60px]"
+                disabled={isEnhancing === enhanceKey}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <Button type="button" variant="outline" size="sm" onClick={() => append({ text: "" })}>
+        <Plus className="w-4 h-4 mr-2" /> Add Bullet Point
+      </Button>
+    </div>
+  );
+}
+
+function EducationBulletList({ control, register, eduIndex, isEnhancing, handleMagicEnhance, handleUndo }: EducationBulletListProps) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `education.${eduIndex}.bulletPoints`,
+  });
+
+  return (
+    <div className="md:col-span-2 space-y-4">
+      <Label>Description / Key Achievements</Label>
+      <div className="space-y-3">
+        {fields.map((field, bulletIndex) => {
+          const enhanceKey = `education-${eduIndex}-${bulletIndex}`;
+          return (
+            <div key={field.id} className="relative flex flex-col gap-2 p-3 border rounded-md bg-background">
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("education", eduIndex, bulletIndex, "metric")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-yellow-500" />} Metric
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("education", eduIndex, bulletIndex, "leadership")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-purple-500" />} Leadership
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("education", eduIndex, bulletIndex, "simple")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-blue-500" />} Simple
+                  </Button>
+                  {control._formValues.education[eduIndex]?.bulletPoints[bulletIndex]?.originalText && (
+                    <Button type="button" variant="secondary" size="sm" className="h-7 text-xs" onClick={() => handleUndo("education", eduIndex, bulletIndex)}>
+                      <Undo className="w-3 h-3 mr-1" /> Undo
+                    </Button>
+                  )}
+                </div>
+                <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive" onClick={() => remove(bulletIndex)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              <Textarea
+                {...register(`education.${eduIndex}.bulletPoints.${bulletIndex}.text` as const)}
+                placeholder="Describe your achievement..."
+                className="min-h-[60px]"
+                disabled={isEnhancing === enhanceKey}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <Button type="button" variant="outline" size="sm" onClick={() => append({ text: "" })}>
+        <Plus className="w-4 h-4 mr-2" /> Add Bullet Point
+      </Button>
+    </div>
+  );
+}
+
+
 export default function ManualFormPage() {
   const { data: sessionData, updateData, isLoaded } = useResumeSession();
+  const [isEnhancing, setIsEnhancing] = useState<string | null>(null);
+
+  const handleMagicEnhance = async (section: "experience" | "education", expIndex: number, bulletIndex: number, style: string) => {
+    const itemData = form.getValues(`${section}.${expIndex}` as const);
+    const bullet = form.getValues(`${section}.${expIndex}.bulletPoints.${bulletIndex}` as const);
+    if (!bullet || !bullet.text.trim()) return;
+
+    const enhanceKey = `${section}-${expIndex}-${bulletIndex}`;
+    setIsEnhancing(enhanceKey);
+    try {
+      const response = await fetch('/api/enhance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: bullet.text,
+          role: 'role' in itemData ? itemData.role : itemData.degree,
+          company: 'company' in itemData ? itemData.company : itemData.institution,
+          style: style,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance text');
+      }
+
+      const data = await response.json();
+      if (data.enhancedText) {
+        const existingOriginalText = form.getValues(`${section}.${expIndex}.bulletPoints.${bulletIndex}.originalText` as const);
+        if (!existingOriginalText) {
+          form.setValue(`${section}.${expIndex}.bulletPoints.${bulletIndex}.originalText` as const, bullet.text);
+        }
+        form.setValue(`${section}.${expIndex}.bulletPoints.${bulletIndex}.text` as const, data.enhancedText, { shouldDirty: true, shouldTouch: true });
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to enhance bullet point. Please try again.');
+    } finally {
+      setIsEnhancing(null);
+    }
+  };
+
+  const handleUndo = (section: "experience" | "education", expIndex: number, bulletIndex: number) => {
+    const originalText = form.getValues(`${section}.${expIndex}.bulletPoints.${bulletIndex}.originalText` as const);
+    if (originalText) {
+      form.setValue(`${section}.${expIndex}.bulletPoints.${bulletIndex}.text` as const, originalText, { shouldDirty: true });
+      form.setValue(`${section}.${expIndex}.bulletPoints.${bulletIndex}.originalText` as const, "");
+    }
+  };
+
+  const handleSummaryEnhance = async (style: string) => {
+    const text = form.getValues("summary");
+    const role = form.getValues("personalInfo.role");
+    if (!text || !text.trim()) return;
+
+    setIsEnhancing("summary");
+    try {
+      const response = await fetch('/api/enhance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          role: role,
+          style: style,
+          type: "summary",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance summary');
+      }
+
+      const data = await response.json();
+      if (data.enhancedText) {
+        const existingOriginalText = form.getValues("summaryOriginalText");
+        if (!existingOriginalText) {
+          form.setValue("summaryOriginalText", text);
+        }
+        form.setValue("summary", data.enhancedText, { shouldDirty: true, shouldTouch: true });
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to enhance summary. Please try again.');
+    } finally {
+      setIsEnhancing(null);
+    }
+  };
+
+  const handleSummaryUndo = () => {
+    const originalText = form.getValues("summaryOriginalText");
+    if (originalText) {
+      form.setValue("summary", originalText, { shouldDirty: true });
+      form.setValue("summaryOriginalText", "");
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -72,6 +303,7 @@ export default function ManualFormPage() {
         role: "",
       },
       summary: "",
+      summaryOriginalText: "",
       experience: [],
       education: [],
       skills: "",
@@ -96,34 +328,53 @@ export default function ManualFormPage() {
       reset({
         personalInfo: sessionData.personalInfo,
         summary: sessionData.summary || "",
-        experience: sessionData.experience.map(e => ({ ...e, description: e.description.join("\n") })) || [],
-        education: sessionData.education.map(e => ({ ...e, description: e.description.join("\n") })) || [],
+        experience: sessionData.experience.map(e => ({
+          ...e,
+          bulletPoints: e.description.map(d => ({ text: d }))
+        })) || [],
+        education: sessionData.education.map(e => ({
+          ...e,
+          bulletPoints: e.description.map(d => ({ text: d }))
+        })) || [],
         skills: sessionData.skills.join(", ") || "",
       });
     }
   }, [isLoaded, sessionData, reset]);
 
   // Derive preview data from live form state
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Derive preview data from live form state
   const livePreviewData: ResumeData = {
     ...sessionData,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    personalInfo: (formValues.personalInfo as any) || sessionData.personalInfo,
-    summary: formValues.summary || "",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    experience: (formValues.experience || []).map((e: any, i) => ({
-      ...e,
-      id: e.id || `exp-${i}`,
-      description: e.description ? e.description.split("\n").filter((d: string) => d.trim() !== "") : [],
+    personalInfo: {
+      firstName: formValues.personalInfo?.firstName ?? sessionData.personalInfo.firstName,
+      lastName: formValues.personalInfo?.lastName ?? sessionData.personalInfo.lastName,
+      email: formValues.personalInfo?.email ?? sessionData.personalInfo.email,
+      phone: formValues.personalInfo?.phone ?? sessionData.personalInfo.phone,
+      location: formValues.personalInfo?.location ?? sessionData.personalInfo.location,
+      linkedin: formValues.personalInfo?.linkedin ?? sessionData.personalInfo.linkedin,
+      website: formValues.personalInfo?.website ?? sessionData.personalInfo.website,
+      role: formValues.personalInfo?.role ?? sessionData.personalInfo.role,
+    },
+    summary: formValues.summary ?? "",
+    experience: (formValues.experience || []).map((e, i) => ({
+      id: e?.id ?? `exp-${i}`,
+      role: e?.role ?? "",
+      company: e?.company ?? "",
+      location: e?.location ?? "",
+      startDate: e?.startDate ?? "",
+      endDate: e?.endDate ?? "",
+      description: e?.bulletPoints ? e.bulletPoints.map((b) => b?.text ?? "").filter((d) => d.trim() !== "") : [],
     })),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    education: (formValues.education || []).map((e: any, i) => ({
-      ...e,
-      id: e.id || `edu-${i}`,
-      description: e.description ? e.description.split("\n").filter((d: string) => d.trim() !== "") : [],
+    education: (formValues.education || []).map((e, i) => ({
+      id: e?.id ?? `edu-${i}`,
+      degree: e?.degree ?? "",
+      institution: e?.institution ?? "",
+      location: e?.location ?? "",
+      startDate: e?.startDate ?? "",
+      endDate: e?.endDate ?? "",
+      description: e?.bulletPoints ? e.bulletPoints.map((b) => b?.text ?? "").filter((d) => d.trim() !== "") : [],
     })),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    skills: formValues.skills ? formValues.skills.split(",").map((s: string) => s.trim()).filter((s: string) => s !== "") : [],
+    skills: formValues.skills ? formValues.skills.split(",").map((s) => s.trim()).filter((s) => s !== "") : [],
   };
 
   const onSubmit = (values: FormValues) => {
@@ -134,12 +385,12 @@ export default function ManualFormPage() {
       experience: values.experience.map(e => ({
         ...e,
         id: e.id || Date.now().toString(),
-        description: e.description.split("\n").filter(d => d.trim() !== "")
+        description: e.bulletPoints.map(b => b.text).filter(d => d.trim() !== "")
       })),
       education: values.education.map(e => ({
         ...e,
         id: e.id || Date.now().toString(),
-        description: e.description.split("\n").filter(d => d.trim() !== "")
+        description: e.bulletPoints.map(b => b.text).filter(d => d.trim() !== "")
       })),
       skills: values.skills.split(",").map(s => s.trim()).filter(s => s !== ""),
     };
@@ -229,11 +480,33 @@ export default function ManualFormPage() {
                 <CardTitle>Professional Summary</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <Textarea
-                  {...register("summary")}
-                  placeholder="A brief summary of your professional background and goals..."
-                  className="min-h-[120px]"
-                />
+                <div className="space-y-2">
+                  <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-2 mb-2">
+                    <Label>Brief overview of your career and skills</Label>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleSummaryEnhance("metric")} disabled={isEnhancing === "summary"}>
+                        {isEnhancing === "summary" ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-yellow-500" />} Metric
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleSummaryEnhance("leadership")} disabled={isEnhancing === "summary"}>
+                        {isEnhancing === "summary" ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-purple-500" />} Leadership
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleSummaryEnhance("simple")} disabled={isEnhancing === "summary"}>
+                        {isEnhancing === "summary" ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-blue-500" />} Simple
+                      </Button>
+                      {formValues.summaryOriginalText && (
+                        <Button type="button" variant="secondary" size="sm" className="h-7 text-xs" onClick={handleSummaryUndo}>
+                          <Undo className="w-3 h-3 mr-1" /> Undo
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <Textarea
+                    {...register("summary")}
+                    placeholder="A brief overview of your career and skills..."
+                    className="min-h-[100px]"
+                    disabled={isEnhancing === "summary"}
+                  />
+                </div>
               </CardContent>
             </Card>
 
@@ -245,7 +518,7 @@ export default function ManualFormPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendExp({ id: "", role: "", company: "", location: "", startDate: "", endDate: "", description: "" })}
+                  onClick={() => appendExp({ id: "", role: "", company: "", location: "", startDate: "", endDate: "", bulletPoints: [{ text: "" }] })}
                 >
                   <Plus size={16} className="mr-2" /> Add Experience
                 </Button>
@@ -279,14 +552,14 @@ export default function ManualFormPage() {
                         <Label>End Date</Label>
                         <Input {...register(`experience.${index}.endDate` as const)} placeholder="Present" />
                       </div>
-                      <div className="md:col-span-2 space-y-2">
-                        <Label>Description (one bullet point per line)</Label>
-                        <Textarea
-                          {...register(`experience.${index}.description` as const)}
-                          placeholder="- Led development of..."
-                          className="min-h-[100px]"
-                        />
-                      </div>
+                      <ExperienceBulletList
+                        control={control}
+                        register={register}
+                        expIndex={index}
+                        isEnhancing={isEnhancing}
+                        handleMagicEnhance={handleMagicEnhance}
+                        handleUndo={handleUndo}
+                      />
                     </div>
                   </div>
                 ))}
@@ -302,7 +575,7 @@ export default function ManualFormPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendEdu({ id: "", degree: "", institution: "", location: "", startDate: "", endDate: "", description: "" })}
+                  onClick={() => appendEdu({ id: "", degree: "", institution: "", location: "", startDate: "", endDate: "", bulletPoints: [{ text: "" }] })}
                 >
                   <Plus size={16} className="mr-2" /> Add Education
                 </Button>
@@ -336,20 +609,21 @@ export default function ManualFormPage() {
                         <Label>End Date</Label>
                         <Input {...register(`education.${index}.endDate` as const)} placeholder="May 2020" />
                       </div>
-                      <div className="md:col-span-2 space-y-2">
-                        <Label>Description / Key Achievements (one bullet point per line)</Label>
-                        <Textarea
-                          {...register(`education.${index}.description` as const)}
-                          placeholder="- Graduated with honors..."
-                          className="min-h-[100px]"
-                        />
-                      </div>
+                      <EducationBulletList
+                        control={control}
+                        register={register}
+                        eduIndex={index}
+                        isEnhancing={isEnhancing}
+                        handleMagicEnhance={handleMagicEnhance}
+                        handleUndo={handleUndo}
+                      />
                     </div>
                   </div>
                 ))}
                 {eduFields.length === 0 && <p className="text-center text-muted-foreground py-4">No education added yet.</p>}
               </CardContent>
             </Card>
+
 
             {/* Skills */}
             <Card className="border-border/50 shadow-sm">
