@@ -5,7 +5,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60; // 60s max duration
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY || "dummy_key_for_build",
 });
 
 export async function POST(req: NextRequest) {
