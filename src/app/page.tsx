@@ -223,6 +223,51 @@ const janeDoeMockData: Record<string, ResumeData> = {
   }
 };
 
+function MiniPreview({ templateId, mockData }: { templateId: string, mockData: ResumeData }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.2);
+
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const width = entry.contentRect.width;
+        setScale(width / 800);
+      }
+    });
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const renderTemplate = () => {
+    switch (templateId) {
+      case "bamboo-modern": return <BambooModern data={mockData} />;
+      case "river-flow": return <RiverFlow data={mockData} />;
+      case "canopy-bold": return <CanopyBold data={mockData} />;
+      case "capybara-classic": default: return <CapybaraClassic data={mockData} />;
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-white rounded-xl shadow-inner group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow">
+      <div 
+        style={{ 
+          width: '800px', 
+          minHeight: '1131px',
+          transform: `scale(${scale})`, 
+          transformOrigin: 'top left',
+          pointerEvents: 'none'
+        }}
+        className="absolute top-0 left-0 bg-white"
+      >
+        {renderTemplate()}
+      </div>
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+        <div className="bg-white text-black px-4 py-2 rounded-full font-bold text-sm">Preview Layout</div>
+      </div>
+    </div>
+  );
+}
+
 const mockExamples = [
   {
     id: 1,
@@ -495,40 +540,8 @@ export default function Home() {
                 className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 cursor-pointer shadow-xl"
               >
                 {/* Mini CV Preview */}
-                <div className={`w-full aspect-[1/1.4] ${ex.color} rounded-xl p-4 shadow-inner flex flex-col gap-3 mb-6 relative overflow-hidden group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow`}>
-
-                  {/* Fake Resume Content */}
-                  <div className={`w-full border-b border-gray-300 pb-2 flex flex-col ${ex.headerAlign}`}>
-                    <div className="w-1/2 h-2.5 bg-gray-800 rounded-full mb-1.5"></div>
-                    <div className="w-1/3 h-1.5 bg-gray-500 rounded-full"></div>
-                  </div>
-
-                  <div className="flex gap-3 h-full">
-                    <div className="w-full flex flex-col gap-3">
-                      <div>
-                        <div className="w-1/4 h-2 bg-gray-600 rounded-full mb-1"></div>
-                        <div className="w-full h-1 bg-gray-300 rounded-full mb-1"></div>
-                        <div className="w-5/6 h-1 bg-gray-300 rounded-full mb-1"></div>
-                        <div className="w-4/6 h-1 bg-gray-300 rounded-full"></div>
-                      </div>
-                      <div>
-                        <div className="w-1/4 h-2 bg-gray-600 rounded-full mb-1"></div>
-                        <div className="w-full h-1 bg-gray-300 rounded-full mb-1"></div>
-                        <div className="w-3/4 h-1 bg-gray-300 rounded-full mb-1"></div>
-                        <div className="w-5/6 h-1 bg-gray-300 rounded-full"></div>
-                      </div>
-                      <div>
-                        <div className="w-1/4 h-2 bg-gray-600 rounded-full mb-1"></div>
-                        <div className="w-full h-1 bg-gray-300 rounded-full mb-1"></div>
-                        <div className="w-2/3 h-1 bg-gray-300 rounded-full"></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hover overlay button */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="bg-white text-black px-4 py-2 rounded-full font-bold text-sm">Preview Layout</div>
-                  </div>
+                <div className="w-full aspect-[210/297] mb-6 relative">
+                  <MiniPreview templateId={ex.templateId} mockData={janeDoeMockData[ex.templateId]} />
                 </div>
 
                 {/* Details */}
@@ -589,6 +602,7 @@ export default function Home() {
                 <div 
                   style={{ 
                     width: '800px', 
+                    minHeight: '1131px',
                     transform: `scale(${scale})`, 
                     transformOrigin: 'top center',
                     marginBottom: `-${800 * (1 - scale)}px`
