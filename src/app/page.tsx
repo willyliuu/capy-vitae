@@ -278,7 +278,7 @@ function MiniPreview({ templateId, mockData }: { templateId: string, mockData: R
   };
 
   return (
-    <div ref={containerRef} className="w-full relative overflow-hidden bg-white rounded-xl shadow-inner group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow">
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-white rounded-xl shadow-inner group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow">
       {scale > 0 && (
         <ScaledContent scale={scale} interactive={false}>
           {renderTemplate()}
@@ -563,7 +563,7 @@ export default function Home() {
                 className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 cursor-pointer shadow-xl"
               >
                 {/* Mini CV Preview */}
-                <div className="w-full mb-6 relative">
+                <div className="w-full aspect-[210/297] mb-6 relative">
                   <MiniPreview templateId={ex.templateId} mockData={janeDoeMockData[ex.templateId]} />
                 </div>
 
