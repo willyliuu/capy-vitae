@@ -381,6 +381,14 @@ export default function ManualFormPage() {
 
   useEffect(() => {
     if (isLoaded && sessionData) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlTemplate = searchParams.get("template");
+      if (urlTemplate && ["generative", "capybara-classic", "bamboo-modern", "river-flow", "canopy-bold"].includes(urlTemplate)) {
+        if (sessionData.templateId !== urlTemplate) {
+          updateData({ templateId: urlTemplate });
+        }
+      }
+
       reset({
         personalInfo: sessionData.personalInfo,
         summary: sessionData.summary || "",
