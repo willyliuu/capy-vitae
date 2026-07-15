@@ -29,6 +29,21 @@ export interface PersonalInfo {
   role: string;
 }
 
+export interface ThemeTokens {
+  primaryColor: string;
+  backgroundColor: string;
+  textColor: string;
+  fontFamily: string;
+  spacing: "compact" | "normal" | "relaxed";
+}
+
+export interface CVLayout {
+  columns: 1 | 2;
+  headerStyle: "centered" | "left-aligned" | "split";
+  sidebar?: ("personalInfo" | "skills" | "education")[];
+  main: ("summary" | "experience" | "education" | "skills")[];
+}
+
 export interface ResumeData {
   personalInfo: PersonalInfo;
   summary: string;
@@ -36,4 +51,6 @@ export interface ResumeData {
   education: Education[];
   skills: string[];
   templateId?: string;
+  theme?: ThemeTokens;
+  layout?: CVLayout;
 }

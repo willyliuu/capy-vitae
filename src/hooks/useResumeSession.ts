@@ -56,7 +56,20 @@ const defaultData: ResumeData = {
     }
   ],
   skills: ["Advanced Chilling", "Aquatic Navigation", "Cross-species Diplomacy", "Grass Eating", "Stress Management", "Agile Methodologies"],
-  templateId: "capybara-classic",
+  templateId: "generative",
+  theme: {
+    primaryColor: "#2563eb",
+    backgroundColor: "#ffffff",
+    textColor: "#1f2937",
+    fontFamily: "font-sans",
+    spacing: "normal",
+  },
+  layout: {
+    columns: 2,
+    headerStyle: "left-aligned",
+    sidebar: ["skills", "education"],
+    main: ["summary", "experience"],
+  }
 };
 
 export function useResumeSession() {

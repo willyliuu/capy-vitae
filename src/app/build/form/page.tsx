@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Trash2, Printer, Sparkles, Loader2, Undo } from "lucide-react";
+import { Plus, Trash2, Printer, Sparkles, Loader2, Undo, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import { CapybaraClassic } from "@/components/templates/CapybaraClassic";
 import { BambooModern } from "@/components/templates/BambooModern";
 import { RiverFlow } from "@/components/templates/RiverFlow";
 import { CanopyBold } from "@/components/templates/CanopyBold";
+import { GenerativeResume } from "@/components/templates/GenerativeResume";
 
 const bulletPointSchema = z.object({
   id: z.string().optional(),
@@ -191,6 +192,61 @@ function EducationBulletList({ control, register, eduIndex, isEnhancing, handleM
 export default function ManualFormPage() {
   const { data: sessionData, updateData, isLoaded } = useResumeSession();
   const [isEnhancing, setIsEnhancing] = useState<string | null>(null);
+  const [isMatchingLayout, setIsMatchingLayout] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [scale, setScale] = useState(1);
+  const previewWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const availableWidth = entry.contentRect.width - 32; // 16px padding on sides
+        setScale(Math.min(1, availableWidth / 800));
+      }
+    });
+    if (previewWrapperRef.current) {
+      observer.observe(previewWrapperRef.current);
+    }
+    return () => observer.disconnect();
+  }, [isLoaded]);
+
+  const handleMatchLayout = async () => {
+    const role = form.getValues("personalInfo.role");
+    const summary = form.getValues("summary");
+    
+    if (!role || !role.trim()) {
+      alert("Please enter a Target Role first.");
+      return;
+    }
+
+    setIsMatchingLayout(true);
+    try {
+      const response = await fetch('/api/matchmaker', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetRole: role, summary }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to match layout');
+      }
+
+      const data = await response.json();
+      if (data.templateId) {
+        updateData({ 
+          templateId: data.templateId,
+          theme: data.theme,
+          layout: data.layout
+        });
+        alert(`✨ Layout updated!\n\nReason: ${data.reason}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to auto-match layout. Please try again.');
+    } finally {
+      setIsMatchingLayout(false);
+    }
+  };
 
   const handleMagicEnhance = async (section: "experience" | "education", expIndex: number, bulletIndex: number, style: string) => {
     const itemData = form.getValues(`${section}.${expIndex}` as const);
@@ -375,6 +431,8 @@ export default function ManualFormPage() {
       description: e?.bulletPoints ? e.bulletPoints.map((b) => b?.text ?? "").filter((d) => d.trim() !== "") : [],
     })),
     skills: formValues.skills ? formValues.skills.split(",").map((s) => s.trim()).filter((s) => s !== "") : [],
+    theme: sessionData.theme,
+    layout: sessionData.layout,
   };
 
   const onSubmit = (values: FormValues) => {
@@ -401,6 +459,8 @@ export default function ManualFormPage() {
 
   const renderTemplate = () => {
     switch (sessionData.templateId) {
+      case "generative":
+        return <GenerativeResume data={livePreviewData} />;
       case "bamboo-modern":
         return <BambooModern data={livePreviewData} />;
       case "river-flow":
@@ -418,7 +478,7 @@ export default function ManualFormPage() {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Left Pane - Form (Hidden on print) */}
-      <div className="w-full lg:w-1/2 p-4 md:p-8 overflow-y-auto print:hidden">
+      <div className={`w-full lg:w-1/2 p-4 md:p-8 overflow-y-auto print:hidden ${showMobilePreview ? 'hidden lg:block' : 'block'}`}>
         <div className="w-full mx-auto animate-in fade-in duration-500">
           <div className="mb-8 flex justify-between items-end">
             <div>
@@ -448,7 +508,19 @@ export default function ManualFormPage() {
                   <Input {...register("personalInfo.lastName")} placeholder="Doe" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Target Role</Label>
+                  <div className="flex justify-between items-center">
+                    <Label>Target Role</Label>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 text-xs text-blue-500 hover:text-blue-600 px-2"
+                      onClick={handleMatchLayout}
+                      disabled={isMatchingLayout}
+                    >
+                      {isMatchingLayout ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />} Auto-Match
+                    </Button>
+                  </div>
                   <Input {...register("personalInfo.role")} placeholder="Software Engineer" />
                 </div>
                 <div className="space-y-2">
@@ -642,8 +714,8 @@ export default function ManualFormPage() {
             </Card>
             
             <div className="pb-10 lg:hidden">
-              <Button form="cv-form" type="submit" size="lg" className="w-full h-14 px-8 text-lg font-bold rounded-full">
-                Download PDF <Printer className="ml-2" />
+              <Button type="button" size="lg" className="w-full h-14 px-8 text-lg font-bold rounded-full" onClick={() => setShowMobilePreview(true)}>
+                Preview CV <Eye className="ml-2" />
               </Button>
             </div>
             
@@ -652,32 +724,55 @@ export default function ManualFormPage() {
       </div>
 
       {/* Right Pane - Live Preview (Printed content) */}
-      <div className="w-full lg:w-1/2 bg-secondary/30 relative flex flex-col lg:h-screen lg:sticky lg:top-0 print:w-full print:bg-white print:h-auto print:static">
+      <div className={`w-full lg:w-1/2 bg-secondary/30 relative flex-col lg:h-screen lg:sticky lg:top-0 print:w-full print:bg-white print:h-auto print:static ${showMobilePreview ? 'flex' : 'hidden lg:flex'}`}>
         
         {/* Template Selector Top Bar - Hidden on print */}
         <div className="absolute top-0 left-0 right-0 p-4 z-10 print:hidden bg-background/80 backdrop-blur-md border-b flex justify-between items-center overflow-x-auto">
-          <div className="flex gap-2 min-w-max pr-4">
-            {["capybara-classic", "bamboo-modern", "river-flow", "canopy-bold"].map((id) => (
+          <div className="flex gap-2 min-w-max pr-4 items-center">
+            <Button variant="ghost" size="sm" className="lg:hidden mr-2" onClick={() => setShowMobilePreview(false)}>
+              ← Back
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={handleMatchLayout}
+              disabled={isMatchingLayout}
+              className="rounded-full px-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0"
+            >
+              {isMatchingLayout ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />} 
+              AI Matchmaker
+            </Button>
+            <div className="h-4 w-px bg-border mx-1"></div>
+            {["generative", "capybara-classic", "bamboo-modern", "river-flow", "canopy-bold"].map((id) => (
               <Button
                 key={id}
-                variant={sessionData.templateId === id ? "default" : "outline"}
+                variant={sessionData.templateId === id ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => updateData({ templateId: id })}
-                className="capitalize text-xs rounded-full px-4"
+                className="capitalize text-xs rounded-full px-3"
               >
                 {id.split("-").join(" ")}
               </Button>
             ))}
           </div>
-          <Button form="cv-form" type="submit" className="hidden lg:flex rounded-full shrink-0" size="sm">
-            <Printer className="w-4 h-4 mr-2" />
-            Download PDF
+          <Button form="cv-form" type="submit" className="flex rounded-full shrink-0" size="sm">
+            <Printer className="w-4 h-4 mr-2 hidden sm:block" />
+            Download
           </Button>
         </div>
         
         {/* Preview Container */}
-        <div className="flex-1 overflow-y-auto p-4 pt-20 lg:p-6 lg:pt-24 print:p-0 print:overflow-visible flex justify-center items-start">
-          <div className="w-full max-w-full shadow-2xl bg-white rounded-sm overflow-hidden border border-border/50 print:border-none print:shadow-none print:rounded-none">
+        <div ref={previewWrapperRef} className="flex-1 overflow-y-auto p-4 pt-20 lg:p-6 lg:pt-24 print:p-0 print:overflow-visible flex flex-col items-center">
+          <div 
+            style={{ 
+              width: '800px', 
+              transform: `scale(${scale})`, 
+              transformOrigin: 'top center',
+              marginBottom: `-${800 * (1 - scale)}px`
+            }}
+            className="shadow-2xl bg-white rounded-sm overflow-hidden border border-border/50 print:border-none print:shadow-none print:rounded-none min-h-[1131px] print:!w-full print:!scale-100 print:!min-h-0 print:!mb-0"
+          >
             {renderTemplate()}
           </div>
         </div>
