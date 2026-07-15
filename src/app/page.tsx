@@ -245,7 +245,7 @@ function ScaledContent({ children, scale, interactive = false, className = "" }:
           transform: `scale(${scale})`, 
           transformOrigin: 'top left'
         }}
-        className="absolute top-0 left-0 w-[800px] bg-white origin-top-left"
+        className="absolute top-0 left-0 w-[800px] bg-white origin-top-left min-h-[1131px]"
       >
         {children}
       </div>

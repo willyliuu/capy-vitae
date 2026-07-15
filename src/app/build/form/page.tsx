@@ -42,7 +42,7 @@ function ScaledContent({ children, scale }: { children: React.ReactNode, scale: 
           transform: `scale(${scale})`, 
           transformOrigin: 'top left'
         }}
-        className="absolute top-0 left-0 bg-white shadow-2xl rounded-sm border border-border/50 print:static print:!scale-100 print:!w-full print:border-none print:shadow-none"
+        className="absolute top-0 left-0 bg-white shadow-2xl rounded-sm border border-border/50 min-h-[1131px] print:static print:!scale-100 print:!w-full print:border-none print:shadow-none print:min-h-0"
       >
         {children}
       </div>
