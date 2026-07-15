@@ -223,6 +223,36 @@ const janeDoeMockData: Record<string, ResumeData> = {
   }
 };
 
+function ScaledContent({ children, scale, interactive = false, className = "" }: { children: React.ReactNode, scale: number, interactive?: boolean, className?: string }) {
+  const [height, setHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      setHeight(entries[0].contentRect.height);
+    });
+    observer.observe(contentRef.current);
+    return () => observer.disconnect();
+  }, [children]);
+
+  return (
+    <div style={{ height: height * scale }} className={`w-full relative ${interactive ? '' : 'pointer-events-none'} ${className}`}>
+      <div 
+        ref={contentRef}
+        style={{ 
+          width: '800px', 
+          transform: `scale(${scale})`, 
+          transformOrigin: 'top left'
+        }}
+        className="absolute top-0 left-0 w-[800px] bg-white origin-top-left"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function MiniPreview({ templateId, mockData }: { templateId: string, mockData: ResumeData }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.2);
@@ -248,20 +278,13 @@ function MiniPreview({ templateId, mockData }: { templateId: string, mockData: R
   };
 
   return (
-    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-white rounded-xl shadow-inner group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow">
-      <div 
-        style={{ 
-          width: '800px', 
-          minHeight: '1131px',
-          transform: `scale(${scale})`, 
-          transformOrigin: 'top left',
-          pointerEvents: 'none'
-        }}
-        className="absolute top-0 left-0 bg-white"
-      >
-        {renderTemplate()}
-      </div>
-      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+    <div ref={containerRef} className="w-full relative overflow-hidden bg-white rounded-xl shadow-inner group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-shadow">
+      {scale > 0 && (
+        <ScaledContent scale={scale} interactive={false}>
+          {renderTemplate()}
+        </ScaledContent>
+      )}
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 cursor-pointer">
         <div className="bg-white text-black px-4 py-2 rounded-full font-bold text-sm">Preview Layout</div>
       </div>
     </div>
@@ -540,7 +563,7 @@ export default function Home() {
                 className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 cursor-pointer shadow-xl"
               >
                 {/* Mini CV Preview */}
-                <div className="w-full aspect-[210/297] mb-6 relative">
+                <div className="w-full mb-6 relative">
                   <MiniPreview templateId={ex.templateId} mockData={janeDoeMockData[ex.templateId]} />
                 </div>
 
@@ -594,22 +617,14 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Modal Content - Scrollable scaled preview */}
               <div 
                 ref={modalWrapperRef} 
                 className="flex-1 overflow-y-auto p-6 flex flex-col items-center bg-black/40 min-h-[300px]"
               >
-                <div 
-                  style={{ 
-                    width: '800px', 
-                    minHeight: '1131px',
-                    transform: `scale(${scale})`, 
-                    transformOrigin: 'top center',
-                    marginBottom: `-${800 * (1 - scale)}px`
-                  }} 
-                  className="shadow-2xl bg-white rounded-sm overflow-hidden"
-                >
-                  {renderActiveTemplate()}
+                <div className="shadow-2xl bg-white rounded-sm overflow-hidden" style={{ width: 800 * scale }}>
+                  <ScaledContent scale={scale} interactive={true}>
+                    {renderActiveTemplate()}
+                  </ScaledContent>
                 </div>
               </div>
 

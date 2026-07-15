@@ -14,12 +14,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useResumeSession } from "@/hooks/useResumeSession";
 import { ResumeData } from "@/types/resume";
 
-// Templates
 import { CapybaraClassic } from "@/components/templates/CapybaraClassic";
 import { BambooModern } from "@/components/templates/BambooModern";
 import { RiverFlow } from "@/components/templates/RiverFlow";
 import { CanopyBold } from "@/components/templates/CanopyBold";
 import { GenerativeResume } from "@/components/templates/GenerativeResume";
+
+function ScaledContent({ children, scale }: { children: React.ReactNode, scale: number }) {
+  const [height, setHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      setHeight(entries[0].contentRect.height);
+    });
+    observer.observe(contentRef.current);
+    return () => observer.disconnect();
+  }, [children]);
+
+  return (
+    <div style={{ height: height * scale }} className="relative w-full print:!h-auto print:!w-full overflow-hidden print:!overflow-visible">
+      <div 
+        ref={contentRef}
+        style={{ 
+          width: '800px', 
+          transform: `scale(${scale})`, 
+          transformOrigin: 'top left'
+        }}
+        className="absolute top-0 left-0 bg-white shadow-2xl rounded-sm border border-border/50 print:static print:!scale-100 print:!w-full print:border-none print:shadow-none"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 const bulletPointSchema = z.object({
   id: z.string().optional(),
@@ -772,16 +801,10 @@ export default function ManualFormPage() {
         
         {/* Preview Container */}
         <div ref={previewWrapperRef} className="flex-1 overflow-y-auto p-4 pt-20 lg:p-6 lg:pt-24 print:p-0 print:overflow-visible flex flex-col items-center">
-          <div 
-            style={{ 
-              width: '800px', 
-              transform: `scale(${scale})`, 
-              transformOrigin: 'top center',
-              marginBottom: `-${800 * (1 - scale)}px`
-            }}
-            className="shadow-2xl bg-white rounded-sm overflow-hidden border border-border/50 print:border-none print:shadow-none print:rounded-none min-h-[1131px] print:!w-full print:!scale-100 print:!min-h-0 print:!mb-0"
-          >
-            {renderTemplate()}
+          <div className="print:w-full" style={{ width: 800 * scale }}>
+            <ScaledContent scale={scale}>
+              {renderTemplate()}
+            </ScaledContent>
           </div>
         </div>
       </div>
