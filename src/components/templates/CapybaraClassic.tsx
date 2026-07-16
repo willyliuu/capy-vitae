@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function CapybaraClassic({ data }: Props) {
-  const { personalInfo, summary, experience, education, skills } = data;
+  const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white text-black p-10 font-serif shadow-lg">
@@ -45,6 +45,27 @@ export function CapybaraClassic({ data }: Props) {
                 </div>
                 <ul className="list-disc list-inside text-sm space-y-1">
                   {exp.description.map((desc, idx) => (
+                    <li key={idx}>{desc}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {projects && projects.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-xl font-bold uppercase border-b border-black mb-3">Projects</h2>
+          <div className="space-y-4">
+            {projects.map((proj) => (
+              <div key={proj.id} className="break-inside-avoid">
+                <div className="flex justify-between font-bold">
+                  <h3>{proj.title} {proj.link && <a href={proj.link} className="text-xs font-normal text-blue-500 hover:underline ml-2">({proj.link})</a>}</h3>
+                  <span>{proj.startDate} – {proj.endDate}</span>
+                </div>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  {proj.description.map((desc, idx) => (
                     <li key={idx}>{desc}</li>
                   ))}
                 </ul>

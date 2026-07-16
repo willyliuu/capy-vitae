@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Trash2, Printer, Sparkles, Loader2, Undo, Eye } from "lucide-react";
+import { Plus, Trash2, Printer, Sparkles, Loader2, Undo, Eye, AlertTriangle, Folder, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,11 +35,11 @@ function ScaledContent({ children, scale }: { children: React.ReactNode, scale: 
 
   return (
     <div style={{ height: height * scale }} className="relative w-full print:!h-auto print:!w-full overflow-hidden print:!overflow-visible">
-      <div 
+      <div
         ref={contentRef}
-        style={{ 
-          width: '800px', 
-          transform: `scale(${scale})`, 
+        style={{
+          width: '800px',
+          transform: `scale(${scale})`,
           transformOrigin: 'top left'
         }}
         className="absolute top-0 left-0 bg-white shadow-2xl rounded-sm border border-border/50 min-h-[1131px] print:static print:!scale-100 print:!w-full print:border-none print:shadow-none print:min-h-0"
@@ -87,6 +87,14 @@ const formSchema = z.object({
     endDate: z.string(),
     bulletPoints: z.array(bulletPointSchema),
   })),
+  projects: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    link: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    bulletPoints: z.array(bulletPointSchema),
+  })),
   skills: z.string(), // Comma separated
 });
 
@@ -110,6 +118,12 @@ interface EducationBulletListProps extends Omit<BulletListProps, 'handleMagicEnh
   eduIndex: number;
   handleMagicEnhance: (section: "education", eduIndex: number, bulletIndex: number, style: string) => Promise<void>;
   handleUndo: (section: "education", eduIndex: number, bulletIndex: number) => void;
+}
+
+interface ProjectBulletListProps extends Omit<BulletListProps, 'handleMagicEnhance' | 'handleUndo'> {
+  projIndex: number;
+  handleMagicEnhance: (section: "projects", projIndex: number, bulletIndex: number, style: string) => Promise<void>;
+  handleUndo: (section: "projects", projIndex: number, bulletIndex: number) => void;
 }
 
 // Components for nested arrays
@@ -161,6 +175,7 @@ function ExperienceBulletList({ control, register, expIndex, isEnhancing, handle
       <Button type="button" variant="outline" size="sm" onClick={() => append({ text: "" })}>
         <Plus className="w-4 h-4 mr-2" /> Add Bullet Point
       </Button>
+
     </div>
   );
 }
@@ -213,22 +228,82 @@ function EducationBulletList({ control, register, eduIndex, isEnhancing, handleM
       <Button type="button" variant="outline" size="sm" onClick={() => append({ text: "" })}>
         <Plus className="w-4 h-4 mr-2" /> Add Bullet Point
       </Button>
+
     </div>
   );
 }
 
+
+
+function ProjectBulletList({ control, register, projIndex, isEnhancing, handleMagicEnhance, handleUndo }: ProjectBulletListProps) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `projects.${projIndex}.bulletPoints`,
+  });
+
+  return (
+    <div className="md:col-span-2 space-y-4">
+      <Label>Description / Key Achievements</Label>
+      <div className="space-y-3">
+        {fields.map((field, bulletIndex) => {
+          const enhanceKey = `projects-${projIndex}-${bulletIndex}`;
+          return (
+            <div key={field.id} className="relative flex flex-col gap-2 p-3 border rounded-md bg-background">
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("projects", projIndex, bulletIndex, "metric")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-yellow-500" />} Metric
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("projects", projIndex, bulletIndex, "leadership")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-purple-500" />} Leadership
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleMagicEnhance("projects", projIndex, bulletIndex, "simple")} disabled={isEnhancing === enhanceKey}>
+                    {isEnhancing === enhanceKey ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1 text-blue-500" />} Simple
+                  </Button>
+                  {control._formValues.projects && control._formValues.projects[projIndex]?.bulletPoints[bulletIndex]?.originalText && (
+                    <Button type="button" variant="secondary" size="sm" className="h-7 text-xs" onClick={() => handleUndo("projects", projIndex, bulletIndex)}>
+                      <Undo className="w-3 h-3 mr-1" /> Undo
+                    </Button>
+                  )}
+                </div>
+                <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive" onClick={() => remove(bulletIndex)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              <Textarea
+                {...register(`projects.${projIndex}.bulletPoints.${bulletIndex}.text` as const)}
+                placeholder="Describe your achievement..."
+                className="min-h-[60px]"
+                disabled={isEnhancing === enhanceKey}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <Button type="button" variant="outline" size="sm" onClick={() => append({ text: "" })}>
+        <Plus className="w-4 h-4 mr-2" /> Add Bullet Point
+      </Button>
+
+    </div>
+  );
+}
 
 export default function ManualFormPage() {
   const { data: sessionData, updateData, isLoaded } = useResumeSession();
   const [isEnhancing, setIsEnhancing] = useState<string | null>(null);
   const [isMatchingLayout, setIsMatchingLayout] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [matchmakerResult, setMatchmakerResult] = useState<{show: boolean, reason?: string, error?: string}>({show: false});
+  const [jobDescription, setJobDescription] = useState("");
+  const [isTailoring, setIsTailoring] = useState(false);
+  const [backupFormValues, setBackupFormValues] = useState<FormValues | null>(null);
   const [scale, setScale] = useState(1);
   const previewWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         const availableWidth = entry.contentRect.width - 32; // 16px padding on sides
         setScale(Math.min(1, availableWidth / 800));
       }
@@ -242,9 +317,9 @@ export default function ManualFormPage() {
   const handleMatchLayout = async () => {
     const role = form.getValues("personalInfo.role");
     const summary = form.getValues("summary");
-    
+
     if (!role || !role.trim()) {
-      alert("Please enter a Target Role first.");
+      setMatchmakerResult({ show: true, error: "Please enter a Target Role in the Personal Info section first. We need to know your role to match you with the perfect template!" });
       return;
     }
 
@@ -262,22 +337,22 @@ export default function ManualFormPage() {
 
       const data = await response.json();
       if (data.templateId) {
-        updateData({ 
+        updateData({
           templateId: data.templateId,
           theme: data.theme,
           layout: data.layout
         });
-        alert(`✨ Layout updated!\n\nReason: ${data.reason}`);
+        setMatchmakerResult({ show: true, reason: data.reason });
       }
     } catch (error) {
       console.error(error);
-      alert('Failed to auto-match layout. Please try again.');
+      setMatchmakerResult({ show: true, error: "Failed to auto-match layout. Please try again." });
     } finally {
       setIsMatchingLayout(false);
     }
   };
 
-  const handleMagicEnhance = async (section: "experience" | "education", expIndex: number, bulletIndex: number, style: string) => {
+  const handleMagicEnhance = async (section: "experience" | "education" | "projects", expIndex: number, bulletIndex: number, style: string) => {
     const itemData = form.getValues(`${section}.${expIndex}` as const);
     const bullet = form.getValues(`${section}.${expIndex}.bulletPoints.${bulletIndex}` as const);
     if (!bullet || !bullet.text.trim()) return;
@@ -292,8 +367,8 @@ export default function ManualFormPage() {
         },
         body: JSON.stringify({
           text: bullet.text,
-          role: 'role' in itemData ? itemData.role : itemData.degree,
-          company: 'company' in itemData ? itemData.company : itemData.institution,
+          role: 'role' in itemData ? itemData.role : 'degree' in itemData ? itemData.degree : itemData.title,
+          company: 'company' in itemData ? itemData.company : 'institution' in itemData ? itemData.institution : '',
           style: style,
         }),
       });
@@ -318,7 +393,7 @@ export default function ManualFormPage() {
     }
   };
 
-  const handleUndo = (section: "experience" | "education", expIndex: number, bulletIndex: number) => {
+  const handleUndo = (section: "experience" | "education" | "projects", expIndex: number, bulletIndex: number) => {
     const originalText = form.getValues(`${section}.${expIndex}.bulletPoints.${bulletIndex}.originalText` as const);
     if (originalText) {
       form.setValue(`${section}.${expIndex}.bulletPoints.${bulletIndex}.text` as const, originalText, { shouldDirty: true });
@@ -391,12 +466,98 @@ export default function ManualFormPage() {
       summaryOriginalText: "",
       experience: [],
       education: [],
+      projects: [],
       skills: "",
     },
   });
 
   const { register, control, handleSubmit, reset } = form;
   const formValues = useWatch({ control });
+
+  interface TailoredItem {
+    id: string;
+    description?: string[];
+  }
+
+  interface TailoredData {
+    summary?: string;
+    skills?: string;
+    experience?: TailoredItem[];
+    education?: TailoredItem[];
+    projects?: TailoredItem[];
+  }
+
+  const handleTailorCV = async () => {
+    if (!jobDescription.trim()) return;
+
+    setIsTailoring(true);
+    // Backup current values before tailoring
+    setBackupFormValues(form.getValues());
+
+    try {
+      const response = await fetch('/api/tailor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobDescription,
+          resumeData: form.getValues()
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to tailor CV');
+      }
+
+      const tailoredData: TailoredData = await response.json();
+
+      // Update form values with tailored data
+      if (tailoredData.summary) {
+        form.setValue('summary', tailoredData.summary, { shouldDirty: true, shouldTouch: true });
+      }
+      if (tailoredData.skills) {
+        form.setValue('skills', tailoredData.skills, { shouldDirty: true, shouldTouch: true });
+      }
+      if (tailoredData.experience) {
+        const currentExp = form.getValues('experience');
+        tailoredData.experience.forEach((tExp) => {
+          const index = currentExp.findIndex(e => e.id === tExp.id);
+          if (index !== -1 && tExp.description) {
+            form.setValue(`experience.${index}.bulletPoints` as `experience.${number}.bulletPoints`, tExp.description.map((d: string) => ({ text: d })), { shouldDirty: true, shouldTouch: true });
+          }
+        });
+      }
+      if (tailoredData.education) {
+        const currentEdu = form.getValues('education');
+        tailoredData.education.forEach((tEdu) => {
+          const index = currentEdu.findIndex(e => e.id === tEdu.id);
+          if (index !== -1 && tEdu.description) {
+            form.setValue(`education.${index}.bulletPoints` as `education.${number}.bulletPoints`, tEdu.description.map((d: string) => ({ text: d })), { shouldDirty: true, shouldTouch: true });
+          }
+        });
+      }
+      if (tailoredData.projects) {
+        const currentProj = form.getValues('projects');
+        tailoredData.projects.forEach((tProj) => {
+          const index = currentProj.findIndex(e => e.id === tProj.id);
+          if (index !== -1 && tProj.description) {
+            form.setValue(`projects.${index}.bulletPoints` as `projects.${number}.bulletPoints`, tProj.description.map((d: string) => ({ text: d })), { shouldDirty: true, shouldTouch: true });
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to tailor CV. Please try again.');
+    } finally {
+      setIsTailoring(false);
+    }
+  };
+
+  const handleRevertTailoring = () => {
+    if (backupFormValues) {
+      reset(backupFormValues);
+      setBackupFormValues(null);
+    }
+  };
 
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control,
@@ -406,6 +567,11 @@ export default function ManualFormPage() {
   const { fields: eduFields, append: appendEdu, remove: removeEdu } = useFieldArray({
     control,
     name: "education",
+  });
+
+  const { fields: projFields, append: appendProj, remove: removeProj } = useFieldArray({
+    control,
+    name: "projects",
   });
 
   useEffect(() => {
@@ -429,7 +595,11 @@ export default function ManualFormPage() {
           ...e,
           bulletPoints: e.description.map(d => ({ text: d }))
         })) || [],
-        skills: sessionData.skills.join(", ") || "",
+        projects: sessionData.projects ? sessionData.projects.map(e => ({
+          ...e,
+          bulletPoints: e.description.map(d => ({ text: d }))
+        })) : [],
+        skills: Array.isArray(sessionData.skills) ? sessionData.skills.join(", ") : (sessionData.skills || ""),
       });
     }
   }, [isLoaded, sessionData, reset]);
@@ -467,9 +637,51 @@ export default function ManualFormPage() {
       endDate: e?.endDate ?? "",
       description: e?.bulletPoints ? e.bulletPoints.map((b) => b?.text ?? "").filter((d) => d.trim() !== "") : [],
     })),
+    projects: (formValues.projects || []).map((e, i) => ({
+      id: e?.id ?? `proj-${i}`,
+      title: e?.title ?? "",
+      link: e?.link ?? "",
+      startDate: e?.startDate ?? "",
+      endDate: e?.endDate ?? "",
+      description: e?.bulletPoints ? e.bulletPoints.map((b) => b?.text ?? "").filter((d) => d.trim() !== "") : [],
+    })),
     skills: formValues.skills ? formValues.skills.split(",").map((s) => s.trim()).filter((s) => s !== "") : [],
     theme: sessionData.theme,
     layout: sessionData.layout,
+  };
+
+  const handleClearAll = () => {
+    const emptyFormValues = {
+      personalInfo: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        location: "",
+        linkedin: "",
+        website: "",
+        role: "",
+      },
+      summary: "",
+      summaryOriginalText: "",
+      experience: [],
+      education: [],
+      projects: [],
+      skills: "",
+    };
+
+    const emptyResumeData: Partial<ResumeData> = {
+      personalInfo: emptyFormValues.personalInfo,
+      summary: "",
+      experience: [],
+      education: [],
+      projects: [],
+      skills: [],
+    };
+
+    reset(emptyFormValues);
+    updateData(emptyResumeData);
+    setShowClearModal(false);
   };
 
   const onSubmit = (values: FormValues) => {
@@ -483,6 +695,11 @@ export default function ManualFormPage() {
         description: e.bulletPoints.map(b => b.text).filter(d => d.trim() !== "")
       })),
       education: values.education.map(e => ({
+        ...e,
+        id: e.id || Date.now().toString(),
+        description: e.bulletPoints.map(b => b.text).filter(d => d.trim() !== "")
+      })),
+      projects: values.projects.map(e => ({
         ...e,
         id: e.id || Date.now().toString(),
         description: e.bulletPoints.map(b => b.text).filter(d => d.trim() !== "")
@@ -522,19 +739,76 @@ export default function ManualFormPage() {
               <h1 className="text-3xl font-heading font-bold mb-2">Complete Your CV</h1>
               <p className="text-muted-foreground">Fill in the details below. Watch it update live!</p>
             </div>
-            <Button form="cv-form" type="submit" size="sm" className="hidden md:flex lg:hidden">
-              <Printer className="w-4 h-4 mr-2" />
-              Download
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => setShowClearModal(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2 hidden sm:block" />
+                Clear All
+              </Button>
+              <Button form="cv-form" type="submit" size="sm" className="hidden md:flex lg:hidden">
+                <Printer className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+            </div>
           </div>
 
           <form id="cv-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
+            {/* ATS Optimizer (JD Tailoring) */}
+            <Card className="border-primary/20 shadow-sm bg-primary/5">
+              <CardHeader className="border-b border-primary/10 flex flex-row items-center justify-between pb-4">
+                <div>
+                  <CardTitle className="flex items-center text-primary">
+                    <Sparkles className="w-5 h-5 mr-2" /> ATS Optimizer
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">Paste a Job Description to tailor your CV automatically.</p>
+                </div>
+                {backupFormValues && (
+                  <Button type="button" variant="outline" size="sm" onClick={handleRevertTailoring}>
+                    <Undo className="w-4 h-4 mr-2" /> Revert Tailoring
+                  </Button>
+                )}
+              </CardHeader>
+              <CardContent className="pt-4 space-y-4">
+                <Textarea
+                  placeholder="Paste Job Description here..."
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  className="min-h-[120px] bg-background"
+                  disabled={isTailoring}
+                />
+                <Button
+                  type="button"
+                  onClick={handleTailorCV}
+                  disabled={isTailoring || !jobDescription.trim()}
+                  className="w-full sm:w-auto"
+                >
+                  {isTailoring ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Tailoring CV...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-2" /> Tailor My CV</>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Personal Info */}
             <Card className="border-border/50 shadow-sm">
               <CardHeader className="bg-secondary/20 border-b border-border/50">
                 <CardTitle>Personal Information</CardTitle>
               </CardHeader>
+              {matchmakerResult.show && (
+                <div className={`m-4 p-3 rounded-md text-sm flex justify-between items-start ${matchmakerResult.error ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'}`}>
+                  <div>{matchmakerResult.error || matchmakerResult.reason}</div>
+                  <button type="button" onClick={() => setMatchmakerResult({show: false})} className="ml-2 hover:opacity-70">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
               <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>First Name</Label>
@@ -547,10 +821,10 @@ export default function ManualFormPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <Label>Target Role</Label>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       className="h-6 text-xs text-blue-500 hover:text-blue-600 px-2"
                       onClick={handleMatchLayout}
                       disabled={isMatchingLayout}
@@ -734,6 +1008,64 @@ export default function ManualFormPage() {
             </Card>
 
 
+
+            {/* Projects */}
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="bg-secondary/20 border-b border-border/50 flex flex-row items-center justify-between">
+                <CardTitle>Projects</CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendProj({ id: "", title: "", link: "", startDate: "", endDate: "", bulletPoints: [{ text: "" }] })}
+                >
+                  <Plus size={16} className="mr-2" /> Add Project
+                </Button>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                {projFields.map((field, index) => (
+                  <div key={field.id} className="p-4 border rounded-lg relative space-y-4 bg-muted/20">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-2 right-2 text-destructive hover:bg-destructive/10"
+                      onClick={() => removeProj(index)}
+                    >
+                      <Trash2 size={18} />
+                    </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                      <div className="space-y-2">
+                        <Label>Project Title</Label>
+                        <Input {...register(`projects.${index}.title` as const)} placeholder="E.g. E-Commerce Website" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Link / URL</Label>
+                        <Input {...register(`projects.${index}.link` as const)} placeholder="https://github.com/..." />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Start Date</Label>
+                        <Input {...register(`projects.${index}.startDate` as const)} placeholder="Jan 2021" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>End Date</Label>
+                        <Input {...register(`projects.${index}.endDate` as const)} placeholder="Present" />
+                      </div>
+                      <ProjectBulletList
+                        control={control}
+                        register={register}
+                        projIndex={index}
+                        isEnhancing={isEnhancing}
+                        handleMagicEnhance={handleMagicEnhance}
+                        handleUndo={handleUndo}
+                      />
+                    </div>
+                  </div>
+                ))}
+                {projFields.length === 0 && <p className="text-center text-muted-foreground py-4">No projects added yet.</p>}
+              </CardContent>
+            </Card>
+
             {/* Skills */}
             <Card className="border-border/50 shadow-sm">
               <CardHeader className="bg-secondary/20 border-b border-border/50">
@@ -749,20 +1081,20 @@ export default function ManualFormPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="pb-10 lg:hidden">
               <Button type="button" size="lg" className="w-full h-14 px-8 text-lg font-bold rounded-full" onClick={() => setShowMobilePreview(true)}>
                 Preview CV <Eye className="ml-2" />
               </Button>
             </div>
-            
+
           </form>
         </div>
       </div>
 
       {/* Right Pane - Live Preview (Printed content) */}
       <div className={`w-full lg:w-1/2 bg-secondary/30 relative flex-col lg:h-screen lg:sticky lg:top-0 print:w-full print:bg-white print:h-auto print:static ${showMobilePreview ? 'flex' : 'hidden lg:flex'}`}>
-        
+
         {/* Template Selector Top Bar - Hidden on print */}
         <div className="absolute top-0 left-0 right-0 p-4 z-10 print:hidden bg-background/80 backdrop-blur-md border-b flex justify-between items-center overflow-x-auto">
           <div className="flex gap-2 min-w-max pr-4 items-center">
@@ -777,11 +1109,25 @@ export default function ManualFormPage() {
               disabled={isMatchingLayout}
               className="rounded-full px-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0"
             >
-              {isMatchingLayout ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />} 
+              {isMatchingLayout ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
               AI Matchmaker
             </Button>
             <div className="h-4 w-px bg-border mx-1"></div>
-            {["generative", "capybara-classic", "bamboo-modern", "river-flow", "canopy-bold"].map((id) => (
+            <Button
+              type="button"
+              variant={sessionData.templateId === "generative" ? "secondary" : "ghost"}
+              size="sm"
+              className="text-xs rounded-full px-3 font-medium"
+              onClick={() => updateData({
+                templateId: "generative",
+                theme: { primaryColor: "#2563eb", backgroundColor: "#ffffff", textColor: "#1f2937", fontFamily: "font-sans", spacing: "normal" },
+                layout: { columns: 2, headerStyle: "left-aligned", sidebar: ["skills", "education"], main: ["summary", "experience", "projects"] }
+              })}
+            >
+              General CV
+            </Button>
+            <div className="h-4 w-px bg-border mx-1 hidden sm:block"></div>
+            {["capybara-classic", "bamboo-modern", "river-flow", "canopy-bold"].map((id) => (
               <Button
                 key={id}
                 variant={sessionData.templateId === id ? "secondary" : "ghost"}
@@ -798,7 +1144,7 @@ export default function ManualFormPage() {
             Download
           </Button>
         </div>
-        
+
         {/* Preview Container */}
         <div ref={previewWrapperRef} className="flex-1 overflow-y-auto p-4 pt-20 lg:p-6 lg:pt-24 print:p-0 print:overflow-visible flex flex-col items-center">
           <div className="print:w-full" style={{ width: 800 * scale }}>
@@ -808,6 +1154,41 @@ export default function ManualFormPage() {
           </div>
         </div>
       </div>
+
+      {/* Clear All Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-background border-2 border-emerald-500/20 shadow-[0_0_40px_-15px_rgba(16,185,129,0.3)] w-full max-w-md p-6 rounded-xl m-4 animate-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-2">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-bold font-heading text-emerald-900 dark:text-emerald-50">Clear All Data?</h2>
+              <p className="text-muted-foreground text-sm">
+                Are you sure you want to clear all your manual entry? This action cannot be undone and you will have to start over.
+              </p>
+              <div className="flex flex-row gap-3 w-full pt-4 mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950"
+                  onClick={() => setShowClearModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={handleClearAll}
+                >
+                  Yes, Clear All
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

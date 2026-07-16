@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function RiverFlow({ data }: Props) {
-  const { personalInfo, summary, experience, education, skills } = data;
+  const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-stone-50 text-stone-800 font-sans p-10 shadow-lg min-h-[1056px]">
@@ -55,7 +55,32 @@ export function RiverFlow({ data }: Props) {
             </section>
           )}
 
-          {education.length > 0 && (
+          {projects && projects.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-px bg-cyan-600 mr-4"></div>
+              <h2 className="text-xl font-medium tracking-wide text-cyan-900 uppercase">Projects</h2>
+            </div>
+            <div className="space-y-6 pl-12 border-l border-cyan-100 ml-4 relative">
+              {projects.map((proj) => (
+                <div key={proj.id} className="break-inside-avoid relative">
+                  <div className="absolute -left-[53px] top-1.5 w-2 h-2 rounded-full bg-cyan-400 ring-4 ring-white"></div>
+                  <div className="mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">{proj.title} {proj.link && <a href={proj.link} className="text-xs font-normal text-blue-500 hover:underline ml-2">({proj.link})</a>}</h3>
+                    <div className="text-sm text-cyan-700 font-medium">{proj.startDate} – {proj.endDate}</div>
+                  </div>
+                  <ul className="list-disc list-outside ml-4 text-gray-600 text-sm space-y-1.5 mt-2">
+                    {proj.description.map((desc, idx) => (
+                      <li key={idx} className="pl-1 leading-relaxed">{desc}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {education.length > 0 && (
             <section>
               <h2 className="text-2xl font-bold text-[#8B5A2B] mb-6 flex items-center">
                 <span className="w-8 h-1 bg-[#8B5A2B] rounded-full mr-3"></span> Education

@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function GenerativeResume({ data }: Props) {
-  const { personalInfo, summary, experience, education, skills, theme, layout } = data;
+  const { personalInfo, summary, experience, education, projects, skills, theme, layout } = data;
 
   // Fallbacks in case the AI didn't generate them or it's a legacy record
   const currentTheme = theme || {
@@ -20,7 +20,7 @@ export function GenerativeResume({ data }: Props) {
   const currentLayout = layout || {
     columns: 1,
     headerStyle: "centered",
-    main: ["summary", "experience", "education", "skills"],
+    main: ["summary", "experience", "projects", "education", "skills"],
   };
 
   const customStyle = {
@@ -94,6 +94,30 @@ export function GenerativeResume({ data }: Props) {
     );
   };
 
+  const renderProjects = () => {
+    if (!projects || projects.length === 0) return null;
+    return (
+      <section key="projects" className="mb-6">
+        <SectionHeader title="Projects" />
+        <div className="space-y-4">
+          {projects.map((proj) => (
+            <div key={proj.id} className="break-inside-avoid">
+              <div className="flex justify-between font-bold" style={{ color: "var(--cv-text)" }}>
+                <h3>{proj.title} {proj.link && <a href={proj.link} className="text-xs font-normal text-blue-500 hover:underline ml-2">({proj.link})</a>}</h3>
+                <span style={{ color: "var(--cv-primary)" }}>{proj.startDate} – {proj.endDate}</span>
+              </div>
+              <ul className="list-disc list-inside text-sm space-y-1 mt-2" style={{ color: "var(--cv-text)" }}>
+                {proj.description.map((desc, idx) => (
+                  <li key={idx}>{desc}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderEducation = () => {
     if (!education || education.length === 0) return null;
     return (
@@ -147,6 +171,7 @@ export function GenerativeResume({ data }: Props) {
       case "summary": return renderSummary();
       case "experience": return renderExperience();
       case "education": return renderEducation();
+        case "projects": return renderProjects();
       case "skills": return renderSkills();
       default: return null;
     }

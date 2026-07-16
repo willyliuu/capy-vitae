@@ -18,6 +18,16 @@ export interface Education {
   description: string[];
 }
 
+export interface Project {
+  id: string;
+  title: string;
+  link: string;
+  startDate: string;
+  endDate: string;
+  description: string[];
+}
+
+
 export interface PersonalInfo {
   firstName: string;
   lastName: string;
@@ -41,7 +51,7 @@ export interface CVLayout {
   columns: 1 | 2;
   headerStyle: "centered" | "left-aligned" | "split";
   sidebar?: ("personalInfo" | "skills" | "education")[];
-  main: ("summary" | "experience" | "education" | "skills")[];
+  main: ("summary" | "experience" | "education" | "projects" | "skills")[];
 }
 
 export interface ResumeData {
@@ -49,6 +59,7 @@ export interface ResumeData {
   summary: string;
   experience: Experience[];
   education: Education[];
+  projects?: Project[];
   skills: string[];
   templateId?: string;
   theme?: ThemeTokens;

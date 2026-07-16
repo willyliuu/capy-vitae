@@ -55,6 +55,7 @@ const defaultData: ResumeData = {
       description: ["Graduated Magna Cum Laude", "President of the Swimming Club"]
     }
   ],
+  projects: [],
   skills: ["Advanced Chilling", "Aquatic Navigation", "Cross-species Diplomacy", "Grass Eating", "Stress Management", "Agile Methodologies"],
   templateId: "generative",
   theme: {
@@ -68,7 +69,7 @@ const defaultData: ResumeData = {
     columns: 2,
     headerStyle: "left-aligned",
     sidebar: ["skills", "education"],
-    main: ["summary", "experience"],
+    main: ["summary", "experience", "projects"],
   }
 };
 

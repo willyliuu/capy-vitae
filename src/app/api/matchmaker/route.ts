@@ -38,14 +38,14 @@ Return a strict JSON object with the following schema:
   "layout": {
     "columns": 1 | 2, // 1 for executive/dense resumes, 2 for junior/creative or when skills are prominent
     "headerStyle": "centered" | "left-aligned" | "split",
-    "sidebar": ["skills", "education"], // Optional, only if columns is 2. Must be an array of strings from: "personalInfo", "skills", "education", "summary", "experience".
-    "main": ["summary", "experience"] // Array of strings from: "summary", "experience", "education", "skills". Define the order of sections!
+    "sidebar": ["skills", "education"], // Optional, only if columns is 2. Must be an array of strings from: "personalInfo", "skills", "education", "summary", "experience", "projects".
+    "main": ["summary", "experience", "projects"] // Array of strings from: "summary", "experience", "projects", "education", "skills". Define the order of sections!
   }
 }
 
 Important Layout Rules:
 - If columns is 1, omit the "sidebar" property completely and put everything in "main".
-- "main" and "sidebar" arrays combined must contain the exact sections (e.g., ["summary", "experience", "education", "skills"]). Do not duplicate sections between them.
+- "main" and "sidebar" arrays combined must contain the exact sections (e.g., ["summary", "experience", "projects", "education", "skills"]). Do not duplicate sections between them.
 - Order matters. E.g., for Junior devs, maybe put "education" before "experience".
 
 Do NOT include any markdown or text outside of the JSON object.`;

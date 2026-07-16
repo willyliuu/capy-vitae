@@ -83,6 +83,16 @@ IMPORTANT: You MUST respond ONLY with a valid JSON object matching this exact st
       "description": ["bullet point 1"]
     }
   ],
+  "projects": [
+    {
+      "id": "unique-string",
+      "title": "string",
+      "link": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "description": ["bullet point 1"]
+    }
+  ],
   "skills": ["skill 1", "skill 2"]
 }
 

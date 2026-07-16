@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function BambooModern({ data }: Props) {
-  const { personalInfo, summary, experience, education, skills } = data;
+  const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white text-gray-800 font-sans shadow-lg flex min-h-[1056px] relative z-0">
@@ -67,6 +67,27 @@ export function BambooModern({ data }: Props) {
                   </div>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
                     {exp.description.map((desc, idx) => (
+                      <li key={idx}>{desc}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {projects && projects.length > 0 && (
+          <section>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Projects</h2>
+            <div className="space-y-6">
+              {projects.map((proj) => (
+                <div key={proj.id} className="break-inside-avoid">
+                  <h3 className="text-lg font-semibold text-gray-900">{proj.title} {proj.link && <a href={proj.link} className="text-xs font-normal text-blue-500 hover:underline ml-2">({proj.link})</a>}</h3>
+                  <div className="text-sm text-gray-500 mb-2 font-medium">
+                    {proj.startDate} - {proj.endDate}
+                  </div>
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {proj.description.map((desc, idx) => (
                       <li key={idx}>{desc}</li>
                     ))}
                   </ul>

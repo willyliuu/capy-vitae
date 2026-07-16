@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function CanopyBold({ data }: Props) {
-  const { personalInfo, summary, experience, education, skills } = data;
+  const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white text-gray-900 font-sans shadow-lg min-h-[1056px]">
@@ -53,6 +53,27 @@ export function CanopyBold({ data }: Props) {
                         <span className="text-[#8B5A2B] mr-2">■</span>
                         <span>{desc}</span>
                       </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {projects && projects.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-black uppercase tracking-widest text-indigo-900 mb-4 border-l-4 border-indigo-600 pl-3">Projects</h2>
+            <div className="space-y-6">
+              {projects.map((proj) => (
+                <div key={proj.id} className="break-inside-avoid">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-2">
+                    <h3 className="text-lg font-bold text-gray-900">{proj.title} {proj.link && <a href={proj.link} className="text-xs font-normal text-blue-500 hover:underline ml-2">({proj.link})</a>}</h3>
+                    <span className="text-sm font-bold text-indigo-600 uppercase tracking-wide">{proj.startDate} - {proj.endDate}</span>
+                  </div>
+                  <ul className="list-disc list-outside ml-5 text-gray-700 text-sm space-y-2 mt-2">
+                    {proj.description.map((desc, idx) => (
+                      <li key={idx} className="pl-2 leading-relaxed">{desc}</li>
                     ))}
                   </ul>
                 </div>
