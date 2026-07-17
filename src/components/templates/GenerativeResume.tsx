@@ -196,7 +196,8 @@ export function GenerativeResume({ data }: Props) {
                 {personalInfo.email && <div>{personalInfo.email}</div>}
                 {personalInfo.phone && <div>{personalInfo.phone}</div>}
                 {personalInfo.location && <div>{personalInfo.location}</div>}
-                {personalInfo.linkedin && <div>{personalInfo.linkedin}</div>}
+                {personalInfo.linkedin && <div><a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline font-medium">{personalInfo.linkedin}</a></div>}
+                {personalInfo.website && <div><a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline font-medium">{personalInfo.website}</a></div>}
               </div>
             </div>
           </>
@@ -210,6 +211,8 @@ export function GenerativeResume({ data }: Props) {
               {personalInfo.email && <span>{personalInfo.email}</span>}
               {personalInfo.phone && <span>{personalInfo.phone}</span>}
               {personalInfo.location && <span>{personalInfo.location}</span>}
+              {personalInfo.linkedin && <span><a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline font-medium">{personalInfo.linkedin}</a></span>}
+              {personalInfo.website && <span><a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline font-medium">{personalInfo.website}</a></span>}
             </div>
           </>
         )}

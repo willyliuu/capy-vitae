@@ -28,7 +28,8 @@ export function BambooModern({ data }: Props) {
             {personalInfo.email && <p>{personalInfo.email}</p>}
             {personalInfo.phone && <p>{personalInfo.phone}</p>}
             {personalInfo.location && <p>{personalInfo.location}</p>}
-            {personalInfo.linkedin && <p className="truncate">{personalInfo.linkedin}</p>}
+            {personalInfo.linkedin && <p className="truncate"><a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{personalInfo.linkedin}</a></p>}
+            {personalInfo.website && <p className="truncate"><a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{personalInfo.website}</a></p>}
           </div>
         </div>
 
