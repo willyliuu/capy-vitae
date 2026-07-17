@@ -15,6 +15,9 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "CapyVitae - AI CV Builder",
   description: "Build your CV with the help of Capy!",
+  icons: {
+    icon: "/assets/mascot/capybara_logo.png",
+  },
 };
 
 export default function RootLayout({

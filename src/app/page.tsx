@@ -238,11 +238,11 @@ function ScaledContent({ children, scale, interactive = false, className = "" }:
 
   return (
     <div style={{ height: height * scale }} className={`w-full relative ${interactive ? '' : 'pointer-events-none'} ${className}`}>
-      <div 
+      <div
         ref={contentRef}
-        style={{ 
-          width: '800px', 
-          transform: `scale(${scale})`, 
+        style={{
+          width: '800px',
+          transform: `scale(${scale})`,
           transformOrigin: 'top left'
         }}
         className="absolute top-0 left-0 w-[800px] bg-white origin-top-left min-h-[1131px]"
@@ -259,7 +259,7 @@ function MiniPreview({ templateId, mockData }: { templateId: string, mockData: R
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         const width = entry.contentRect.width;
         setScale(width / 800);
       }
@@ -451,7 +451,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
               className="text-base text-gray-300 font-medium leading-relaxed mb-6"
             >
-              The relaxing way to build your perfect resume. Craft your professional story with ease using simple, modern templates inspired by the calm of nature.
+              The intelligent way to build your perfect resume. Craft your professional story with ease using AI Matchmaker for layouts and job description optimization to perfectly tailor your CV.
             </motion.p>
 
             <motion.div
@@ -492,9 +492,9 @@ export default function Home() {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
             </div>
             <span className="text-[#A17757] font-bold text-xs tracking-wider uppercase mb-1">Step 1</span>
-            <h3 className="text-lg font-bold text-white mb-2">Modern Templates</h3>
+            <h3 className="text-lg font-bold text-white mb-2">AI Matchmaker Layouts</h3>
             <p className="text-gray-300 leading-relaxed text-[14px]">
-              Choose from a variety of sleek, professional layouts designed to make your experience stand out.
+              Use our AI Matchmaker to automatically generate the perfect CV layout tailored specifically to your profile.
             </p>
           </motion.div>
 
@@ -504,9 +504,9 @@ export default function Home() {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
             </div>
             <span className="text-[#A17757] font-bold text-xs tracking-wider uppercase mb-1">Step 2</span>
-            <h3 className="text-lg font-bold text-white mb-2">Intuitive Builder</h3>
+            <h3 className="text-lg font-bold text-white mb-2">AI Job Optimization</h3>
             <p className="text-gray-300 leading-relaxed text-[14px]">
-              Our smart editor takes the hassle out of formatting so you can focus purely on your content.
+              Provide a job description and let our AI tailor and optimize your CV content to match the role perfectly.
             </p>
           </motion.div>
 
@@ -594,7 +594,7 @@ export default function Home() {
       <AnimatePresence>
         {activePreviewTemplate && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -609,7 +609,7 @@ export default function Home() {
                   </h3>
                   <p className="text-xs text-gray-400 mt-1">Mock profile for Jane Doe</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setActivePreviewTemplate(null)}
                   className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-colors"
                 >
@@ -617,8 +617,8 @@ export default function Home() {
                 </button>
               </div>
 
-              <div 
-                ref={modalWrapperRef} 
+              <div
+                ref={modalWrapperRef}
                 className="flex-1 overflow-y-auto p-6 flex flex-col items-center bg-black/40 min-h-[300px]"
               >
                 <div className="shadow-2xl bg-white rounded-sm overflow-hidden" style={{ width: 800 * scale }}>
@@ -634,7 +634,7 @@ export default function Home() {
                   Ready to write your own CV using this layout?
                 </p>
                 <div className="flex gap-3">
-                  <button 
+                  <button
                     onClick={() => setActivePreviewTemplate(null)}
                     className="px-6 py-3 rounded-full text-sm font-semibold border border-white/10 hover:bg-white/5 text-white transition-colors"
                   >
