@@ -42,7 +42,7 @@ export function RiverFlow({ data }: Props) {
                     <div className="absolute w-3 h-3 bg-white border-2 border-[#8B5A2B] rounded-full left-[-1.95rem] top-1.5"></div>
                     <h3 className="text-lg font-bold text-stone-900">{exp.role}</h3>
                     <div className="text-sm text-[#0F1A0F] font-semibold mb-2">
-                      {exp.company} <span className="text-stone-400 font-normal">| {exp.startDate} - {exp.endDate}</span>
+                      {exp.company}{exp.location ? ` | ${exp.location}` : ""} <span className="text-stone-400 font-normal">| {exp.startDate} - {exp.endDate}</span>
                     </div>
                     <ul className="list-disc list-outside ml-4 text-sm text-stone-600 space-y-1.5">
                       {exp.description.map((desc, idx) => (
@@ -91,7 +91,7 @@ export function RiverFlow({ data }: Props) {
                     <div className="absolute w-3 h-3 bg-white border-2 border-[#8B5A2B] rounded-full left-[-1.95rem] top-1.5"></div>
                     <h3 className="text-lg font-bold text-stone-900">{edu.degree}</h3>
                     <div className="text-sm text-[#0F1A0F] font-semibold mb-2">
-                      {edu.institution} <span className="text-stone-400 font-normal">| {edu.startDate} - {edu.endDate}</span>
+                      {edu.institution}{edu.location ? ` | ${edu.location}` : ""} <span className="text-stone-400 font-normal">| {edu.startDate} - {edu.endDate}</span>
                     </div>
                     <ul className="list-disc list-outside ml-4 text-sm text-stone-600 space-y-1.5">
                       {edu.description.map((desc, idx) => (

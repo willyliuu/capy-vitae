@@ -930,6 +930,10 @@ export default function ManualFormPage() {
                         <Label>Company</Label>
                         <Input {...register(`experience.${index}.company` as const)} placeholder="Acme Corp" />
                       </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label>Location</Label>
+                        <Input {...register(`experience.${index}.location` as const)} placeholder="New York, NY (Optional)" />
+                      </div>
                       <div className="space-y-2">
                         <Label>Start Date</Label>
                         <Input {...register(`experience.${index}.startDate` as const)} placeholder="Jan 2020" />
@@ -986,6 +990,10 @@ export default function ManualFormPage() {
                       <div className="space-y-2">
                         <Label>Institution</Label>
                         <Input {...register(`education.${index}.institution` as const)} placeholder="State University" />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label>Location</Label>
+                        <Input {...register(`education.${index}.location` as const)} placeholder="Boston, MA (Optional)" />
                       </div>
                       <div className="space-y-2">
                         <Label>Start Date</Label>

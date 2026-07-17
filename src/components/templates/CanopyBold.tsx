@@ -45,7 +45,7 @@ export function CanopyBold({ data }: Props) {
                     </span>
                   </div>
                   <div className="text-base font-bold text-gray-500 mb-3 uppercase tracking-wide">
-                    {exp.company} | {exp.location}
+                    {exp.company}{exp.location ? ` | ${exp.location}` : ""}
                   </div>
                   <ul className="list-square list-inside text-sm text-gray-800 space-y-2 font-medium">
                     {exp.description.map((desc, idx) => (
@@ -95,7 +95,7 @@ export function CanopyBold({ data }: Props) {
                     </span>
                   </div>
                   <div className="text-base font-bold text-[#8B5A2B] mb-2 uppercase tracking-wide">
-                    {edu.institution} | {edu.location}
+                    {edu.institution}{edu.location ? ` | ${edu.location}` : ""}
                   </div>
                   <ul className="list-square list-inside text-sm text-gray-800 space-y-2 font-medium">
                     {edu.description.map((desc, idx) => (

@@ -63,7 +63,7 @@ export function BambooModern({ data }: Props) {
                 <div key={exp.id} className="break-inside-avoid">
                   <h3 className="text-lg font-semibold text-gray-900">{exp.role}</h3>
                   <div className="text-sm text-gray-500 mb-2 font-medium">
-                    {exp.company} • {exp.startDate} - {exp.endDate}
+                    {exp.company}{exp.location ? ` • ${exp.location}` : ""} • {exp.startDate} - {exp.endDate}
                   </div>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
                     {exp.description.map((desc, idx) => (
@@ -105,7 +105,7 @@ export function BambooModern({ data }: Props) {
                 <div key={edu.id} className="break-inside-avoid">
                   <h3 className="text-lg font-semibold text-gray-900">{edu.degree}</h3>
                   <div className="text-sm text-gray-500 mb-2 font-medium">
-                    {edu.institution} • {edu.startDate} - {edu.endDate}
+                    {edu.institution}{edu.location ? ` • ${edu.location}` : ""} • {edu.startDate} - {edu.endDate}
                   </div>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
                     {edu.description.map((desc, idx) => (
