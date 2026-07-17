@@ -574,8 +574,11 @@ export default function ManualFormPage() {
     name: "projects",
   });
 
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
-    if (isLoaded && sessionData) {
+    if (isLoaded && sessionData && !hasInitialized.current) {
+      hasInitialized.current = true;
       const searchParams = new URLSearchParams(window.location.search);
       const urlTemplate = searchParams.get("template");
       if (urlTemplate && ["generative", "capybara-classic", "bamboo-modern", "river-flow", "canopy-bold"].includes(urlTemplate)) {
@@ -1093,7 +1096,7 @@ export default function ManualFormPage() {
       </div>
 
       {/* Right Pane - Live Preview (Printed content) */}
-      <div className={`w-full lg:w-1/2 bg-secondary/30 relative flex-col lg:h-screen lg:sticky lg:top-0 print:w-full print:bg-white print:h-auto print:static ${showMobilePreview ? 'flex' : 'hidden lg:flex'}`}>
+      <div className={`w-full lg:w-1/2 bg-secondary/30 relative flex-col lg:h-screen lg:sticky lg:top-0 print:!w-full print:bg-white print:h-auto print:static print:!flex ${showMobilePreview ? 'flex' : 'hidden lg:flex'}`}>
 
         {/* Template Selector Top Bar - Hidden on print */}
         <div className="absolute top-0 left-0 right-0 p-4 z-10 print:hidden bg-background/80 backdrop-blur-md border-b flex justify-between items-center overflow-x-auto">
@@ -1147,7 +1150,7 @@ export default function ManualFormPage() {
 
         {/* Preview Container */}
         <div ref={previewWrapperRef} className="flex-1 overflow-y-auto p-4 pt-20 lg:p-6 lg:pt-24 print:p-0 print:overflow-visible flex flex-col items-center">
-          <div className="print:w-full" style={{ width: 800 * scale }}>
+          <div className="print:!w-full" style={{ width: 800 * scale }}>
             <ScaledContent scale={scale}>
               {renderTemplate()}
             </ScaledContent>

@@ -9,7 +9,7 @@ export function BambooModern({ data }: Props) {
   const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white text-gray-800 font-sans shadow-lg flex min-h-[1056px] relative z-0">
+    <div className="w-full bg-white text-gray-800 font-sans flex min-h-[1131px] relative z-0">
       {/* Print Background Hack: Repeats on every PDF page */}
       <div className="hidden print:block fixed inset-y-0 left-0 w-1/3 bg-gray-100 -z-10" />
 

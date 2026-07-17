@@ -179,7 +179,7 @@ export function GenerativeResume({ data }: Props) {
 
   return (
     <div 
-      className={`w-full max-w-4xl mx-auto shadow-lg ${currentTheme.fontFamily} ${getSpacingClass()}`}
+      className={`w-full min-h-[1131px] ${currentTheme.fontFamily} ${getSpacingClass()}`}
       style={{ ...customStyle, backgroundColor: "var(--cv-bg)" }}
     >
       <header className={`border-b-2 pb-4 mb-6 ${getHeaderAlignment()}`} style={{ borderColor: "var(--cv-primary)" }}>

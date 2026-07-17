@@ -9,7 +9,7 @@ export function CanopyBold({ data }: Props) {
   const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white text-gray-900 font-sans shadow-lg min-h-[1056px]">
+    <div className="w-full bg-white text-gray-900 font-sans min-h-[1131px]">
       <header className="bg-[#0F1A0F] text-white p-12">
         <h1 className="text-5xl font-black uppercase tracking-tighter mb-2">
           {personalInfo.firstName} {personalInfo.lastName}

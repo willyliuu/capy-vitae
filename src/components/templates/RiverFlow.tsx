@@ -9,7 +9,7 @@ export function RiverFlow({ data }: Props) {
   const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-stone-50 text-stone-800 font-sans p-10 shadow-lg min-h-[1056px]">
+    <div className="w-full bg-stone-50 text-stone-800 font-sans p-10 min-h-[1131px]">
       <header className="mb-10 text-center">
         <h1 className="text-4xl font-extrabold text-stone-900 tracking-tight mb-2">
           {personalInfo.firstName} {personalInfo.lastName}

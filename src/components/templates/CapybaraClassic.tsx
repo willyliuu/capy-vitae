@@ -9,7 +9,7 @@ export function CapybaraClassic({ data }: Props) {
   const { personalInfo, summary, experience, education, projects, skills } = data;
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white text-black p-10 font-serif shadow-lg">
+    <div className="w-full bg-white text-black p-10 font-serif min-h-[1131px]">
       <header className="text-center border-b-2 border-black pb-4 mb-6">
         <h1 className="text-4xl font-bold uppercase mb-2">
           {personalInfo.firstName} {personalInfo.lastName}
