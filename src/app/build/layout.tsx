@@ -1,8 +1,15 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function BuildLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isOnboarding = pathname === "/build";
+  const isBuild = pathname.includes("/form");
+
   return (
     <div className="min-h-screen flex flex-col bg-transparent">
       {/* Top Navigation / Progress */}
@@ -16,11 +23,9 @@ export default function BuildLayout({ children }: { children: React.ReactNode })
           </Link>
 
           <nav className="flex items-center space-x-6 text-sm font-medium text-muted-foreground">
-            <span className="hidden sm:inline-block">Onboarding</span>
+            <span className={`hidden sm:inline-block ${isOnboarding ? "text-foreground font-semibold" : ""}`}>Onboarding</span>
             <span className="hidden sm:inline-block">&gt;</span>
-            <span className="text-foreground font-semibold">Build</span>
-            <span className="hidden sm:inline-block">&gt;</span>
-            <span className="hidden sm:inline-block">Preview</span>
+            <span className={`hidden sm:inline-block ${isBuild ? "text-foreground font-semibold" : ""}`}>Build</span>
           </nav>
         </div>
       </header>
